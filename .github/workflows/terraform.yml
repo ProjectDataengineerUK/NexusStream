@@ -7,14 +7,17 @@ on:
 
 permissions:
   contents: read
-  id-token: write # Necessário para autenticação segura (OIDC)
+  id-token: write 
 
 jobs:
   terraform:
     runs-on: ubuntu-latest
+    # Movendo as variáveis de ambiente para o nível do JOB para garantir que todos os passos as vejam
     env:
       TF_VAR_project_id: ${{ secrets.GCP_PROJECT_ID }}
       TF_VAR_weather_api_token: ${{ secrets.OPENWEATHER_API_KEY }}
+      TF_VAR_dataform_github_token: ${{ secrets.DATAFORM_GITHUB_TOKEN }}
+      TF_VAR_region: "southamerica-east1" # Ou sua região de preferência
 
     steps:
     - name: Checkout
@@ -23,7 +26,6 @@ jobs:
     - name: Google Auth
       uses: 'google-github-actions/auth@v2'
       with:
-        # Recomendado: Usar Workload Identity Federation em vez de chaves JSON
         credentials_json: '${{ secrets.GCP_SA_KEY }}'
 
     - name: Setup Terraform
@@ -31,10 +33,13 @@ jobs:
 
     - name: Terraform Init
       run: terraform init
+      working-directory: ./terraform # Se o seu código TF estiver nesta pasta
 
     - name: Terraform Plan
       run: terraform plan -input=false
+      working-directory: ./terraform
 
     - name: Terraform Apply
       if: github.ref == 'refs/heads/main' && github.event_name == 'push'
       run: terraform apply -auto-approve -input=false
+      working-directory: ./terraform
