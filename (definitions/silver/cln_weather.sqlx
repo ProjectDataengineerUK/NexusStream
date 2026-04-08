@@ -1,0 +1,27 @@
+config {
+  type: "table",
+  description: "Camada Silver: Dados de clima limpos e validados",
+  columns: {
+    city_name: "Nome da cidade em caixa alta",
+    temp: "Temperatura em Celsius (Filtro: -60 a 60)",
+    ingested_at: "Timestamp original de ingestão"
+  },
+  assertions: {
+    uniqueKey: ["city_name", "ingested_at"],
+    nonNull: ["city_name", "temp"],
+    rowConditions: [
+      "temp > -60 AND temp < 60" -- O Filtro de Barro: ignora valores absurdos
+    ]
+  }
+}
+
+SELECT
+  UPPER(TRIM(city_name)) AS city_name,
+  CAST(temp AS FLOAT64) AS temp,
+  weather_data,
+  ingested_at,
+  CURRENT_TIMESTAMP() AS processed_at
+FROM
+  ${ref("stg_weather_external")}
+WHERE
+  city_name IS NOT NULL

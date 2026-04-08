@@ -1,0 +1,33 @@
+name: 'Dataform CI/CD'
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    paths:
+      - 'definitions/**'
+      - 'workflow_settings.yaml'
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  dataform-ci:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Google Auth
+        uses: 'google-github-actions/auth@v2'
+        with:
+          credentials_json: '${{ secrets.GCP_SA_KEY }}'
+
+      - name: Install Dataform CLI
+        run: npm i -g @dataform/cli
+
+      - name: Dataform Compile
+        run: |
+          dataform install
+          dataform compile

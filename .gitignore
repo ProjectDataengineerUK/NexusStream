@@ -1,0 +1,33 @@
+# --- SEGURANÇA (O mais importante) ---
+# Bloqueia qualquer arquivo JSON (onde geralmente estão as chaves do GCP)
+*.json
+# Caso você use nomes específicos para chaves
+credentials.json
+key.json
+
+# --- TERRAFORM ---
+# Bloqueia a pasta de binários e plugins
+.terraform/
+# Bloqueia o arquivo de estado (pode conter segredos em texto plano)
+*.tfstate
+*.tfstate.backup
+# Bloqueia o arquivo de variáveis sensíveis
+*.tfvars
+*.tfvars.json
+
+# --- PYTHON ---
+# Bloqueia pastas de ambiente virtual
+venv/
+.venv/
+env/
+# Bloqueia arquivos compilados e cache
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+
+# --- SISTEMA E IDE ---
+.DS_Store
+.vscode/
+.idea/
+.env

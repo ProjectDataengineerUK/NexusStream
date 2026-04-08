@@ -1,0 +1,1208 @@
+{
+  "version": 4,
+  "terraform_version": "1.14.8",
+  "serial": 117,
+  "lineage": "2f719b55-4a69-2aac-f8c0-adb4fa474006",
+  "outputs": {},
+  "resources": [
+    {
+      "mode": "data",
+      "type": "archive_file",
+      "name": "function_zip",
+      "provider": "provider[\"registry.terraform.io/hashicorp/archive\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "exclude_symlink_directories": null,
+            "excludes": null,
+            "id": "b6648e488f090dfd1e4129563979f430bda78138",
+            "output_base64sha256": "EzkXHRf3/lu1GBt8g/Iix88+//49ZSNtmz9Jt9auKao=",
+            "output_base64sha512": "3+0//KuqOPUVBvR22fXgHIHKJn83MI9Ko3iFa8W855BF08+mIiJCEf8KR8AXZH+NzWxO98Yiy2ngOnUqDtfLkQ==",
+            "output_file_mode": null,
+            "output_md5": "37eda0c71641efd9711759932b7d8681",
+            "output_path": "./ingest_weather.zip",
+            "output_sha": "b6648e488f090dfd1e4129563979f430bda78138",
+            "output_sha256": "1339171d17f7fe5bb5181b7c83f222c7cf3efffe3d65236d9b3f49b7d6ae29aa",
+            "output_sha512": "dfed3ffcabaa38f51506f476d9f5e01c81ca267f37308f4aa378856bc5bce79045d3cfa622224211ff0a47c017647f8dcd6c4ef7c622cb69e03a752a0ed7cb91",
+            "output_size": 1042,
+            "source": [],
+            "source_content": null,
+            "source_content_filename": null,
+            "source_dir": "./../functions/ingest_weather",
+            "source_file": null,
+            "type": "zip"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0
+        }
+      ]
+    },
+    {
+      "mode": "data",
+      "type": "google_project",
+      "name": "project",
+      "provider": "provider[\"registry.terraform.io/hashicorp/google\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "auto_create_network": null,
+            "billing_account": "01B5FE-57BAC0-4BAB1A",
+            "deletion_policy": "PREVENT",
+            "effective_labels": {},
+            "folder_id": null,
+            "id": "projects/nexus-stream-project",
+            "labels": {},
+            "name": "nexus-stream-project",
+            "number": "710865849165",
+            "org_id": null,
+            "project_id": "nexus-stream-project",
+            "tags": null,
+            "terraform_labels": {}
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "google_bigquery_dataset",
+      "name": "nexus_raw",
+      "provider": "provider[\"registry.terraform.io/hashicorp/google\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "access": [
+              {
+                "condition": [],
+                "dataset": [],
+                "domain": "",
+                "group_by_email": "",
+                "iam_member": "",
+                "role": "OWNER",
+                "routine": [],
+                "special_group": "",
+                "user_by_email": "jonataslccanal01@gmail.com",
+                "view": []
+              },
+              {
+                "condition": [],
+                "dataset": [],
+                "domain": "",
+                "group_by_email": "",
+                "iam_member": "",
+                "role": "OWNER",
+                "routine": [],
+                "special_group": "projectOwners",
+                "user_by_email": "",
+                "view": []
+              },
+              {
+                "condition": [],
+                "dataset": [],
+                "domain": "",
+                "group_by_email": "",
+                "iam_member": "",
+                "role": "READER",
+                "routine": [],
+                "special_group": "projectReaders",
+                "user_by_email": "",
+                "view": []
+              },
+              {
+                "condition": [],
+                "dataset": [],
+                "domain": "",
+                "group_by_email": "",
+                "iam_member": "",
+                "role": "WRITER",
+                "routine": [],
+                "special_group": "projectWriters",
+                "user_by_email": "",
+                "view": []
+              }
+            ],
+            "creation_time": 1775659300225,
+            "dataset_id": "nexus_raw_layer",
+            "default_collation": "",
+            "default_encryption_configuration": [],
+            "default_partition_expiration_ms": 0,
+            "default_table_expiration_ms": 0,
+            "delete_contents_on_destroy": false,
+            "description": "Camada Bronze: Dados brutos",
+            "effective_labels": {
+              "goog-terraform-provisioned": "true"
+            },
+            "etag": "Huqpw1nogRvnC7h/z2oiUg==",
+            "external_catalog_dataset_options": [],
+            "external_dataset_reference": [],
+            "friendly_name": "Nexus Raw Data",
+            "id": "projects/nexus-stream-project/datasets/nexus_raw_layer",
+            "is_case_insensitive": false,
+            "labels": {},
+            "last_modified_time": 1775665234509,
+            "location": "us-central1",
+            "max_time_travel_hours": "168",
+            "project": "nexus-stream-project",
+            "resource_tags": {},
+            "self_link": "https://bigquery.googleapis.com/bigquery/v2/projects/nexus-stream-project/datasets/nexus_raw_layer",
+            "storage_billing_model": "",
+            "terraform_labels": {
+              "goog-terraform-provisioned": "true"
+            },
+            "timeouts": null
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjoxMjAwMDAwMDAwMDAwLCJkZWxldGUiOjEyMDAwMDAwMDAwMDAsInVwZGF0ZSI6MTIwMDAwMDAwMDAwMH19"
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "google_bigquery_dataset",
+      "name": "raw_dataset",
+      "provider": "provider[\"registry.terraform.io/hashicorp/google\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "access": [
+              {
+                "condition": [],
+                "dataset": [],
+                "domain": "",
+                "group_by_email": "",
+                "iam_member": "",
+                "role": "OWNER",
+                "routine": [],
+                "special_group": "",
+                "user_by_email": "jonataslccanal01@gmail.com",
+                "view": []
+              },
+              {
+                "condition": [],
+                "dataset": [],
+                "domain": "",
+                "group_by_email": "",
+                "iam_member": "",
+                "role": "OWNER",
+                "routine": [],
+                "special_group": "projectOwners",
+                "user_by_email": "",
+                "view": []
+              },
+              {
+                "condition": [],
+                "dataset": [],
+                "domain": "",
+                "group_by_email": "",
+                "iam_member": "",
+                "role": "READER",
+                "routine": [],
+                "special_group": "projectReaders",
+                "user_by_email": "",
+                "view": []
+              },
+              {
+                "condition": [],
+                "dataset": [],
+                "domain": "",
+                "group_by_email": "",
+                "iam_member": "",
+                "role": "WRITER",
+                "routine": [],
+                "special_group": "projectWriters",
+                "user_by_email": "",
+                "view": []
+              }
+            ],
+            "creation_time": 1775612827630,
+            "dataset_id": "raw_github_data",
+            "default_collation": "",
+            "default_encryption_configuration": [],
+            "default_partition_expiration_ms": 0,
+            "default_table_expiration_ms": 0,
+            "delete_contents_on_destroy": false,
+            "description": "",
+            "effective_labels": {
+              "goog-terraform-provisioned": "true"
+            },
+            "etag": "Ae9yYlarhRsOczxHxFgbXQ==",
+            "external_catalog_dataset_options": [],
+            "external_dataset_reference": [],
+            "friendly_name": "",
+            "id": "projects/nexus-stream-project/datasets/raw_github_data",
+            "is_case_insensitive": false,
+            "labels": {},
+            "last_modified_time": 1775612827630,
+            "location": "us-central1",
+            "max_time_travel_hours": "168",
+            "project": "nexus-stream-project",
+            "resource_tags": {},
+            "self_link": "https://bigquery.googleapis.com/bigquery/v2/projects/nexus-stream-project/datasets/raw_github_data",
+            "storage_billing_model": "",
+            "terraform_labels": {
+              "goog-terraform-provisioned": "true"
+            },
+            "timeouts": null
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjoxMjAwMDAwMDAwMDAwLCJkZWxldGUiOjEyMDAwMDAwMDAwMDAsInVwZGF0ZSI6MTIwMDAwMDAwMDAwMH19"
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "google_bigquery_dataset",
+      "name": "raw_github",
+      "provider": "provider[\"registry.terraform.io/hashicorp/google\"]",
+      "instances": []
+    },
+    {
+      "mode": "managed",
+      "type": "google_bigquery_table",
+      "name": "events_table",
+      "provider": "provider[\"registry.terraform.io/hashicorp/google\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "biglake_configuration": [],
+            "clustering": [
+              "event_type",
+              "repo_name"
+            ],
+            "creation_time": 1775612828542,
+            "dataset_id": "raw_github_data",
+            "deletion_protection": true,
+            "description": "",
+            "effective_labels": {
+              "goog-terraform-provisioned": "true"
+            },
+            "encryption_configuration": [],
+            "etag": "9LADcx4K6OIzIrIe5xUARA==",
+            "expiration_time": 0,
+            "external_catalog_table_options": [],
+            "external_data_configuration": [],
+            "friendly_name": "",
+            "generated_schema_columns": "",
+            "id": "projects/nexus-stream-project/datasets/raw_github_data/tables/github_events_stream",
+            "ignore_auto_generated_schema": false,
+            "ignore_schema_changes": null,
+            "labels": {},
+            "last_modified_time": 1775612828635,
+            "location": "us-central1",
+            "materialized_view": [],
+            "max_staleness": "",
+            "num_bytes": 0,
+            "num_long_term_bytes": 0,
+            "num_rows": 0,
+            "project": "nexus-stream-project",
+            "range_partitioning": [],
+            "require_partition_filter": false,
+            "resource_tags": {},
+            "schema": "[{\"mode\":\"REQUIRED\",\"name\":\"event_id\",\"type\":\"STRING\"},{\"mode\":\"NULLABLE\",\"name\":\"event_type\",\"type\":\"STRING\"},{\"mode\":\"NULLABLE\",\"name\":\"repo_name\",\"type\":\"STRING\"},{\"mode\":\"REQUIRED\",\"name\":\"created_at\",\"type\":\"TIMESTAMP\"},{\"mode\":\"NULLABLE\",\"name\":\"payload_json\",\"type\":\"JSON\"}]",
+            "schema_foreign_type_info": [],
+            "self_link": "https://bigquery.googleapis.com/bigquery/v2/projects/nexus-stream-project/datasets/raw_github_data/tables/github_events_stream",
+            "table_constraints": [],
+            "table_id": "github_events_stream",
+            "table_metadata_view": null,
+            "table_replication_info": [],
+            "terraform_labels": {
+              "goog-terraform-provisioned": "true"
+            },
+            "time_partitioning": [
+              {
+                "expiration_ms": 0,
+                "field": "created_at",
+                "require_partition_filter": false,
+                "type": "DAY"
+              }
+            ],
+            "type": "TABLE",
+            "view": []
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "bnVsbA==",
+          "dependencies": [
+            "google_bigquery_dataset.raw_dataset",
+            "google_bigquery_dataset.raw_github"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "google_cloudfunctions_function",
+      "name": "weather_processor",
+      "provider": "provider[\"registry.terraform.io/hashicorp/google\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "automatic_update_policy": [
+              {}
+            ],
+            "available_memory_mb": 256,
+            "build_environment_variables": null,
+            "build_service_account": "projects/nexus-stream-project/serviceAccounts/710865849165-compute@developer.gserviceaccount.com",
+            "build_worker_pool": "",
+            "description": "Processa JSON da OpenWeather para o BigQuery",
+            "docker_registry": "ARTIFACT_REGISTRY",
+            "docker_repository": "",
+            "effective_labels": {
+              "goog-terraform-provisioned": "true"
+            },
+            "entry_point": "process_weather_event",
+            "environment_variables": {
+              "TABLE_ID": "nexus-stream-project.nexus_raw_layer.weather_history"
+            },
+            "event_trigger": [
+              {
+                "event_type": "google.storage.object.finalize",
+                "failure_policy": [
+                  {
+                    "retry": false
+                  }
+                ],
+                "resource": "projects/nexus-stream-project/buckets/nexus-stream-project-nexus-raw-data"
+              }
+            ],
+            "https_trigger_security_level": null,
+            "https_trigger_url": null,
+            "id": "projects/nexus-stream-project/locations/us-central1/functions/nexus-weather-processor",
+            "ingress_settings": "ALLOW_ALL",
+            "kms_key_name": "",
+            "labels": null,
+            "max_instances": 3000,
+            "min_instances": 0,
+            "name": "nexus-weather-processor",
+            "on_deploy_update_policy": [],
+            "project": "nexus-stream-project",
+            "region": "us-central1",
+            "runtime": "python310",
+            "secret_environment_variables": [],
+            "secret_volumes": [],
+            "service_account_email": "nexus-stream-sa@nexus-stream-project.iam.gserviceaccount.com",
+            "source_archive_bucket": "nexus-stream-project-nexus-raw-data",
+            "source_archive_object": "code/ingest_weather-37eda0c71641efd9711759932b7d8681.zip",
+            "source_repository": [],
+            "status": "ACTIVE",
+            "terraform_labels": {
+              "goog-terraform-provisioned": "true"
+            },
+            "timeout": 60,
+            "timeouts": null,
+            "trigger_http": null,
+            "version_id": "1",
+            "vpc_connector": "",
+            "vpc_connector_egress_settings": ""
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjoxMjAwMDAwMDAwMDAwLCJkZWxldGUiOjEyMDAwMDAwMDAwMDAsInJlYWQiOjEyMDAwMDAwMDAwMDAsInVwZGF0ZSI6MTIwMDAwMDAwMDAwMH19",
+          "dependencies": [
+            "data.archive_file.function_zip",
+            "google_bigquery_dataset.nexus_raw",
+            "google_bigquery_table.weather_table",
+            "google_project_iam_member.eventarc_receiver",
+            "google_project_iam_member.secret_accessor",
+            "google_project_iam_member.workflow_invoker",
+            "google_service_account.function_sa",
+            "google_storage_bucket.raw_data_bucket",
+            "google_storage_bucket_object.function_code",
+            "time_sleep.wait_iam_propagation"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "google_cloudfunctions_function_iam_member",
+      "name": "invoker",
+      "provider": "provider[\"registry.terraform.io/hashicorp/google\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "cloud_function": "projects/nexus-stream-project/locations/us-central1/functions/nexus-weather-processor",
+            "condition": [],
+            "etag": "BwZO9UxWvYE=",
+            "id": "projects/nexus-stream-project/locations/us-central1/functions/nexus-weather-processor/roles/cloudfunctions.invoker/serviceAccount:nexus-stream-sa@nexus-stream-project.iam.gserviceaccount.com",
+            "member": "serviceAccount:nexus-stream-sa@nexus-stream-project.iam.gserviceaccount.com",
+            "project": "nexus-stream-project",
+            "region": "us-central1",
+            "role": "roles/cloudfunctions.invoker"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "bnVsbA==",
+          "dependencies": [
+            "data.archive_file.function_zip",
+            "google_bigquery_dataset.nexus_raw",
+            "google_bigquery_table.weather_table",
+            "google_cloudfunctions_function.weather_processor",
+            "google_project_iam_member.eventarc_receiver",
+            "google_project_iam_member.secret_accessor",
+            "google_project_iam_member.workflow_invoker",
+            "google_service_account.function_sa",
+            "google_storage_bucket.raw_data_bucket",
+            "google_storage_bucket_object.function_code",
+            "time_sleep.wait_iam_propagation"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "google_eventarc_trigger",
+      "name": "storage_trigger",
+      "provider": "provider[\"registry.terraform.io/hashicorp/google\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "channel": "",
+            "conditions": {},
+            "create_time": "2026-04-08T12:41:08.354616149Z",
+            "destination": [
+              {
+                "cloud_function": "",
+                "cloud_run_service": [],
+                "gke": [],
+                "http_endpoint": [],
+                "network_config": [],
+                "workflow": "projects/nexus-stream-project/locations/us-central1/workflows/nexus-main-workflow"
+              }
+            ],
+            "effective_labels": {
+              "goog-terraform-provisioned": "true"
+            },
+            "etag": "",
+            "event_data_content_type": "application/json",
+            "id": "projects/nexus-stream-project/locations/us-central1/triggers/nexus-storage-trigger",
+            "labels": {},
+            "location": "us-central1",
+            "matching_criteria": [
+              {
+                "attribute": "bucket",
+                "operator": "",
+                "value": "nexus-stream-project-nexus-raw-data"
+              },
+              {
+                "attribute": "type",
+                "operator": "",
+                "value": "google.cloud.storage.object.v1.finalized"
+              }
+            ],
+            "name": "projects/nexus-stream-project/locations/us-central1/triggers/nexus-storage-trigger",
+            "project": "nexus-stream-project",
+            "retry_policy": [],
+            "service_account": "nexus-stream-sa@nexus-stream-project.iam.gserviceaccount.com",
+            "terraform_labels": {
+              "goog-terraform-provisioned": "true"
+            },
+            "timeouts": null,
+            "transport": [
+              {
+                "pubsub": [
+                  {
+                    "subscription": "projects/nexus-stream-project/subscriptions/eventarc-us-central1-nexus-storage-trigger-sub-534",
+                    "topic": "projects/nexus-stream-project/topics/eventarc-us-central1-nexus-storage-trigger-650"
+                  }
+                ]
+              }
+            ],
+            "uid": "aa9df91e-e9f6-43b3-a53c-a16fc6fecdae",
+            "update_time": "2026-04-08T12:41:16.517037205Z"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjoxMjAwMDAwMDAwMDAwLCJkZWxldGUiOjEyMDAwMDAwMDAwMDAsInVwZGF0ZSI6MTIwMDAwMDAwMDAwMH19",
+          "dependencies": [
+            "google_project_iam_member.eventarc_receiver",
+            "google_project_iam_member.secret_accessor",
+            "google_project_iam_member.workflow_invoker",
+            "google_service_account.function_sa",
+            "google_storage_bucket.raw_data_bucket",
+            "google_workflows_workflow.nexus_workflow",
+            "time_sleep.wait_iam_propagation"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "google_project_iam_member",
+      "name": "eventarc_receiver",
+      "provider": "provider[\"registry.terraform.io/hashicorp/google\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "condition": [],
+            "etag": "BwZO9Bg/h1o=",
+            "id": "nexus-stream-project/roles/eventarc.eventReceiver/serviceAccount:nexus-stream-sa@nexus-stream-project.iam.gserviceaccount.com",
+            "member": "serviceAccount:nexus-stream-sa@nexus-stream-project.iam.gserviceaccount.com",
+            "project": "nexus-stream-project",
+            "role": "roles/eventarc.eventReceiver"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "bnVsbA==",
+          "dependencies": [
+            "google_service_account.function_sa"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "google_project_iam_member",
+      "name": "gcs_pubsub_publishing",
+      "provider": "provider[\"registry.terraform.io/hashicorp/google\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "condition": [],
+            "etag": "BwZO9Bg/h1o=",
+            "id": "nexus-stream-project/roles/pubsub.publisher/serviceAccount:service-710865849165@gs-project-accounts.iam.gserviceaccount.com",
+            "member": "serviceAccount:service-710865849165@gs-project-accounts.iam.gserviceaccount.com",
+            "project": "nexus-stream-project",
+            "role": "roles/pubsub.publisher"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "bnVsbA==",
+          "dependencies": [
+            "data.google_project.project"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "google_project_iam_member",
+      "name": "pubsub_token_creator",
+      "provider": "provider[\"registry.terraform.io/hashicorp/google\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "condition": [],
+            "etag": "BwZO9Bg/h1o=",
+            "id": "nexus-stream-project/roles/iam.serviceAccountTokenCreator/serviceAccount:service-710865849165@gcp-sa-pubsub.iam.gserviceaccount.com",
+            "member": "serviceAccount:service-710865849165@gcp-sa-pubsub.iam.gserviceaccount.com",
+            "project": "nexus-stream-project",
+            "role": "roles/iam.serviceAccountTokenCreator"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "bnVsbA==",
+          "dependencies": [
+            "data.google_project.project"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "google_project_iam_member",
+      "name": "sa_bq_editor",
+      "provider": "provider[\"registry.terraform.io/hashicorp/google\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "condition": [],
+            "etag": "BwZO9Bg/h1o=",
+            "id": "nexus-stream-project/roles/bigquery.dataEditor/serviceAccount:nexus-stream-sa@nexus-stream-project.iam.gserviceaccount.com",
+            "member": "serviceAccount:nexus-stream-sa@nexus-stream-project.iam.gserviceaccount.com",
+            "project": "nexus-stream-project",
+            "role": "roles/bigquery.dataEditor"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "bnVsbA==",
+          "dependencies": [
+            "google_service_account.function_sa"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "google_project_iam_member",
+      "name": "sa_storage_viewer",
+      "provider": "provider[\"registry.terraform.io/hashicorp/google\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "condition": [],
+            "etag": "BwZO9Bg/h1o=",
+            "id": "nexus-stream-project/roles/storage.objectViewer/serviceAccount:nexus-stream-sa@nexus-stream-project.iam.gserviceaccount.com",
+            "member": "serviceAccount:nexus-stream-sa@nexus-stream-project.iam.gserviceaccount.com",
+            "project": "nexus-stream-project",
+            "role": "roles/storage.objectViewer"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "bnVsbA==",
+          "dependencies": [
+            "google_service_account.function_sa"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "google_project_iam_member",
+      "name": "secret_accessor",
+      "provider": "provider[\"registry.terraform.io/hashicorp/google\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "condition": [],
+            "etag": "BwZO9Bg/h1o=",
+            "id": "nexus-stream-project/roles/secretmanager.secretAccessor/serviceAccount:nexus-stream-sa@nexus-stream-project.iam.gserviceaccount.com",
+            "member": "serviceAccount:nexus-stream-sa@nexus-stream-project.iam.gserviceaccount.com",
+            "project": "nexus-stream-project",
+            "role": "roles/secretmanager.secretAccessor"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "bnVsbA==",
+          "dependencies": [
+            "google_service_account.function_sa"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "google_project_iam_member",
+      "name": "workflow_invoker",
+      "provider": "provider[\"registry.terraform.io/hashicorp/google\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "condition": [],
+            "etag": "BwZO9Bg/h1o=",
+            "id": "nexus-stream-project/roles/workflows.invoker/serviceAccount:nexus-stream-sa@nexus-stream-project.iam.gserviceaccount.com",
+            "member": "serviceAccount:nexus-stream-sa@nexus-stream-project.iam.gserviceaccount.com",
+            "project": "nexus-stream-project",
+            "role": "roles/workflows.invoker"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "bnVsbA==",
+          "dependencies": [
+            "google_service_account.function_sa"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "google_pubsub_subscription",
+      "name": "events_subscription",
+      "provider": "provider[\"registry.terraform.io/hashicorp/google\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "ack_deadline_seconds": 60,
+            "bigquery_config": [],
+            "cloud_storage_config": [],
+            "dead_letter_policy": [
+              {
+                "dead_letter_topic": "projects/nexus-stream-project/topics/nexus-events-dlq",
+                "max_delivery_attempts": 5
+              }
+            ],
+            "effective_labels": {
+              "goog-terraform-provisioned": "true"
+            },
+            "enable_exactly_once_delivery": false,
+            "enable_message_ordering": false,
+            "expiration_policy": [
+              {
+                "ttl": "2678400s"
+              }
+            ],
+            "filter": "",
+            "id": "projects/nexus-stream-project/subscriptions/nexus-events-sub",
+            "labels": {},
+            "message_retention_duration": "604800s",
+            "message_transforms": [],
+            "name": "nexus-events-sub",
+            "project": "nexus-stream-project",
+            "push_config": [],
+            "retain_acked_messages": false,
+            "retry_policy": [
+              {
+                "maximum_backoff": "600s",
+                "minimum_backoff": "10s"
+              }
+            ],
+            "tags": null,
+            "terraform_labels": {
+              "goog-terraform-provisioned": "true"
+            },
+            "timeouts": null,
+            "topic": "projects/nexus-stream-project/topics/nexus-github-events"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjoxMjAwMDAwMDAwMDAwLCJkZWxldGUiOjEyMDAwMDAwMDAwMDAsInVwZGF0ZSI6MTIwMDAwMDAwMDAwMH19",
+          "dependencies": [
+            "google_pubsub_topic.dead_letter_topic",
+            "google_pubsub_topic.events_topic"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "google_pubsub_topic",
+      "name": "dead_letter_topic",
+      "provider": "provider[\"registry.terraform.io/hashicorp/google\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "effective_labels": {
+              "goog-terraform-provisioned": "true"
+            },
+            "id": "projects/nexus-stream-project/topics/nexus-events-dlq",
+            "ingestion_data_source_settings": [],
+            "kms_key_name": "",
+            "labels": {},
+            "message_retention_duration": "",
+            "message_storage_policy": [],
+            "message_transforms": [],
+            "name": "nexus-events-dlq",
+            "project": "nexus-stream-project",
+            "schema_settings": [],
+            "tags": null,
+            "terraform_labels": {
+              "goog-terraform-provisioned": "true"
+            },
+            "timeouts": null
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjoxMjAwMDAwMDAwMDAwLCJkZWxldGUiOjEyMDAwMDAwMDAwMDAsInVwZGF0ZSI6MTIwMDAwMDAwMDAwMH19"
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "google_pubsub_topic",
+      "name": "events_topic",
+      "provider": "provider[\"registry.terraform.io/hashicorp/google\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "effective_labels": {
+              "goog-terraform-provisioned": "true"
+            },
+            "id": "projects/nexus-stream-project/topics/nexus-github-events",
+            "ingestion_data_source_settings": [],
+            "kms_key_name": "",
+            "labels": {},
+            "message_retention_duration": "",
+            "message_storage_policy": [],
+            "message_transforms": [],
+            "name": "nexus-github-events",
+            "project": "nexus-stream-project",
+            "schema_settings": [],
+            "tags": null,
+            "terraform_labels": {
+              "goog-terraform-provisioned": "true"
+            },
+            "timeouts": null
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjoxMjAwMDAwMDAwMDAwLCJkZWxldGUiOjEyMDAwMDAwMDAwMDAsInVwZGF0ZSI6MTIwMDAwMDAwMDAwMH19"
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "google_secret_manager_secret",
+      "name": "weather_api_key",
+      "provider": "provider[\"registry.terraform.io/hashicorp/google\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "annotations": {},
+            "create_time": "2026-04-08T14:01:54.312719Z",
+            "deletion_protection": false,
+            "effective_annotations": {},
+            "effective_labels": {
+              "goog-terraform-provisioned": "true"
+            },
+            "expire_time": "",
+            "id": "projects/nexus-stream-project/secrets/openweathermap-api-key",
+            "labels": {},
+            "name": "projects/710865849165/secrets/openweathermap-api-key",
+            "project": "nexus-stream-project",
+            "replication": [
+              {
+                "auto": [
+                  {
+                    "customer_managed_encryption": []
+                  }
+                ],
+                "user_managed": []
+              }
+            ],
+            "rotation": [],
+            "secret_id": "openweathermap-api-key",
+            "tags": null,
+            "terraform_labels": {
+              "goog-terraform-provisioned": "true"
+            },
+            "timeouts": null,
+            "topics": [],
+            "ttl": null,
+            "version_aliases": {},
+            "version_destroy_ttl": ""
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjoxMjAwMDAwMDAwMDAwLCJkZWxldGUiOjEyMDAwMDAwMDAwMDAsInVwZGF0ZSI6MTIwMDAwMDAwMDAwMH19"
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "google_secret_manager_secret_iam_member",
+      "name": "workflow_secret_access",
+      "provider": "provider[\"registry.terraform.io/hashicorp/google\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "condition": [],
+            "etag": "BwZO81fGjfg=",
+            "id": "projects/nexus-stream-project/secrets/openweathermap-api-key/roles/secretmanager.secretAccessor/serviceAccount:nexus-stream-sa@nexus-stream-project.iam.gserviceaccount.com",
+            "member": "serviceAccount:nexus-stream-sa@nexus-stream-project.iam.gserviceaccount.com",
+            "project": "nexus-stream-project",
+            "role": "roles/secretmanager.secretAccessor",
+            "secret_id": "projects/nexus-stream-project/secrets/openweathermap-api-key"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "bnVsbA==",
+          "dependencies": [
+            "google_secret_manager_secret.weather_api_key"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "google_secret_manager_secret_version",
+      "name": "weather_api_key_version",
+      "provider": "provider[\"registry.terraform.io/hashicorp/google\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "create_time": "2026-04-08T14:01:57.857354Z",
+            "deletion_policy": "DELETE",
+            "destroy_time": "",
+            "enabled": true,
+            "id": "projects/710865849165/secrets/openweathermap-api-key/versions/1",
+            "is_secret_data_base64": false,
+            "name": "projects/710865849165/secrets/openweathermap-api-key/versions/1",
+            "project": null,
+            "secret": "projects/nexus-stream-project/secrets/openweathermap-api-key",
+            "secret_data": "a62ca28cd75cfad42b2b76d500908b1d",
+            "secret_data_wo": null,
+            "secret_data_wo_version": 0,
+            "timeouts": null,
+            "version": "1"
+          },
+          "sensitive_attributes": [
+            [
+              {
+                "type": "get_attr",
+                "value": "secret_data"
+              }
+            ]
+          ],
+          "identity_schema_version": 0,
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjoxMjAwMDAwMDAwMDAwLCJkZWxldGUiOjEyMDAwMDAwMDAwMDAsInVwZGF0ZSI6MTIwMDAwMDAwMDAwMH19",
+          "dependencies": [
+            "google_secret_manager_secret.weather_api_key"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "google_service_account",
+      "name": "function_sa",
+      "provider": "provider[\"registry.terraform.io/hashicorp/google\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "account_id": "nexus-stream-sa",
+            "create_ignore_already_exists": null,
+            "description": "",
+            "disabled": false,
+            "display_name": "Service Account para NexusStream Pipeline",
+            "email": "nexus-stream-sa@nexus-stream-project.iam.gserviceaccount.com",
+            "id": "projects/nexus-stream-project/serviceAccounts/nexus-stream-sa@nexus-stream-project.iam.gserviceaccount.com",
+            "member": "serviceAccount:nexus-stream-sa@nexus-stream-project.iam.gserviceaccount.com",
+            "name": "projects/nexus-stream-project/serviceAccounts/nexus-stream-sa@nexus-stream-project.iam.gserviceaccount.com",
+            "project": "nexus-stream-project",
+            "timeouts": null,
+            "unique_id": "102497231661877093477"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjozMDAwMDAwMDAwMDB9fQ=="
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "google_storage_bucket",
+      "name": "raw_data_bucket",
+      "provider": "provider[\"registry.terraform.io/hashicorp/google\"]",
+      "instances": [
+        {
+          "schema_version": 4,
+          "attributes": {
+            "autoclass": [],
+            "cors": [],
+            "custom_placement_config": [],
+            "default_event_based_hold": false,
+            "effective_labels": {
+              "goog-terraform-provisioned": "true"
+            },
+            "enable_object_retention": false,
+            "encryption": [],
+            "force_destroy": true,
+            "hierarchical_namespace": [
+              {
+                "enabled": false
+              }
+            ],
+            "id": "nexus-stream-project-nexus-raw-data",
+            "ip_filter": [],
+            "labels": {},
+            "lifecycle_rule": [],
+            "location": "US-CENTRAL1",
+            "logging": [],
+            "name": "nexus-stream-project-nexus-raw-data",
+            "project": "nexus-stream-project",
+            "project_number": 710865849165,
+            "public_access_prevention": "inherited",
+            "requester_pays": false,
+            "retention_policy": [],
+            "rpo": null,
+            "self_link": "https://www.googleapis.com/storage/v1/b/nexus-stream-project-nexus-raw-data",
+            "soft_delete_policy": [
+              {
+                "effective_time": "2026-04-08T11:54:25.918Z",
+                "retention_duration_seconds": 604800
+              }
+            ],
+            "storage_class": "STANDARD",
+            "terraform_labels": {
+              "goog-terraform-provisioned": "true"
+            },
+            "time_created": "2026-04-08T11:54:25.918Z",
+            "timeouts": null,
+            "uniform_bucket_level_access": false,
+            "updated": "2026-04-08T15:48:57.060Z",
+            "url": "gs://nexus-stream-project-nexus-raw-data",
+            "versioning": [],
+            "website": []
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjo2MDAwMDAwMDAwMDAsInJlYWQiOjI0MDAwMDAwMDAwMCwidXBkYXRlIjoyNDAwMDAwMDAwMDB9LCJzY2hlbWFfdmVyc2lvbiI6IjQifQ=="
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "google_storage_bucket_iam_member",
+      "name": "sa_storage_writer",
+      "provider": "provider[\"registry.terraform.io/hashicorp/google\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "bucket": "b/nexus-stream-project-nexus-raw-data",
+            "condition": [],
+            "etag": "CAU=",
+            "id": "b/nexus-stream-project-nexus-raw-data/roles/storage.objectCreator/serviceAccount:nexus-stream-sa@nexus-stream-project.iam.gserviceaccount.com",
+            "member": "serviceAccount:nexus-stream-sa@nexus-stream-project.iam.gserviceaccount.com",
+            "role": "roles/storage.objectCreator",
+            "timeouts": null
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjoxMjAwMDAwMDAwMDAwfX0=",
+          "dependencies": [
+            "google_service_account.function_sa",
+            "google_storage_bucket.raw_data_bucket"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "google_storage_bucket_object",
+      "name": "function_code",
+      "provider": "provider[\"registry.terraform.io/hashicorp/google\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "bucket": "nexus-stream-project-nexus-raw-data",
+            "cache_control": "",
+            "content": null,
+            "content_disposition": "",
+            "content_encoding": "",
+            "content_language": "",
+            "content_type": "application/zip",
+            "contexts": [],
+            "crc32c": "oMXglA==",
+            "customer_encryption": [],
+            "deletion_policy": null,
+            "detect_md5hash": "N+2gxxZB79lxF1mTK32GgQ==",
+            "event_based_hold": false,
+            "force_empty_content_type": null,
+            "generation": 1775664578688683,
+            "id": "nexus-stream-project-nexus-raw-data-code/ingest_weather-37eda0c71641efd9711759932b7d8681.zip",
+            "kms_key_name": "",
+            "md5hash": "N+2gxxZB79lxF1mTK32GgQ==",
+            "md5hexhash": "37eda0c71641efd9711759932b7d8681",
+            "media_link": "https://storage.googleapis.com/download/storage/v1/b/nexus-stream-project-nexus-raw-data/o/code%2Fingest_weather-37eda0c71641efd9711759932b7d8681.zip?generation=1775664578688683\u0026alt=media",
+            "metadata": {},
+            "name": "code/ingest_weather-37eda0c71641efd9711759932b7d8681.zip",
+            "output_name": "code/ingest_weather-37eda0c71641efd9711759932b7d8681.zip",
+            "retention": [],
+            "self_link": "https://www.googleapis.com/storage/v1/b/nexus-stream-project-nexus-raw-data/o/code%2Fingest_weather-37eda0c71641efd9711759932b7d8681.zip",
+            "source": "./ingest_weather.zip",
+            "source_md5hash": "",
+            "storage_class": "STANDARD",
+            "temporary_hold": false,
+            "timeouts": null
+          },
+          "sensitive_attributes": [
+            [
+              {
+                "type": "get_attr",
+                "value": "content"
+              }
+            ]
+          ],
+          "identity_schema_version": 0,
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjoyNDAwMDAwMDAwMDAsImRlbGV0ZSI6MjQwMDAwMDAwMDAwLCJ1cGRhdGUiOjI0MDAwMDAwMDAwMH19",
+          "dependencies": [
+            "data.archive_file.function_zip",
+            "google_storage_bucket.raw_data_bucket"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "google_workflows_workflow",
+      "name": "nexus_workflow",
+      "provider": "provider[\"registry.terraform.io/hashicorp/google\"]",
+      "instances": [
+        {
+          "schema_version": 1,
+          "attributes": {
+            "call_log_level": "",
+            "create_time": "2026-04-08T12:20:31.010608876Z",
+            "crypto_key_name": "",
+            "deletion_protection": true,
+            "description": "",
+            "effective_labels": {
+              "goog-terraform-provisioned": "true"
+            },
+            "execution_history_level": "",
+            "id": "projects/nexus-stream-project/locations/us-central1/workflows/nexus-main-workflow",
+            "labels": {},
+            "name": "nexus-main-workflow",
+            "name_prefix": null,
+            "project": "nexus-stream-project",
+            "region": "us-central1",
+            "revision_id": "000005-a3f",
+            "service_account": "projects/nexus-stream-project/serviceAccounts/nexus-stream-sa@nexus-stream-project.iam.gserviceaccount.com",
+            "source_contents": "main:\r\n  steps:\r\n    - init:\r\n        assign:\r\n          - project_id: ${sys.get_env(\"GOOGLE_CLOUD_PROJECT_ID\")}\r\n          - bucket_name: \"nexus-stream-project-nexus-raw-data\"\r\n          - city: \"Sao Paulo\"\r\n          - current_time: ${string(int(sys.now()))}\r\n\r\n    - get_secret:\r\n        call: googleapis.secretmanager.v1.projects.secrets.versions.access\r\n        args:\r\n          name: ${\"projects/\" + project_id + \"/secrets/openweathermap-api-key/versions/latest\"}\r\n        result: secret_response\r\n\r\n    - decode_secret:\r\n        assign:\r\n          - api_key: ${text.decode(base64.decode(secret_response.payload.data))}\r\n\r\n    - fetch_weather_data:\r\n        call: http.get\r\n        args:\r\n          url: \"https://api.openweathermap.org/data/2.5/weather\"\r\n          query:\r\n            q: ${city}\r\n            appid: ${api_key}\r\n            units: \"metric\"\r\n        result: weather_response\r\n\r\n    - save_to_raw_storage:\r\n        call: googleapis.storage.v1.objects.insert\r\n        args:\r\n          bucket: ${bucket_name}\r\n          name: ${\"ingestion/weather/\" + current_time + \".json\"}\r\n          body: ${weather_response.body}\r\n\r\n    - finish:\r\n        return:\r\n          message: \"Ingestão realizada com sucesso\"\r\n          file_saved: ${\"ingestion/weather/\" + current_time + \".json\"}\r\n          # Corrigido de .status para .code\r\n          http_code: ${weather_response.code}\r\n",
+            "state": "ACTIVE",
+            "tags": null,
+            "terraform_labels": {
+              "goog-terraform-provisioned": "true"
+            },
+            "timeouts": null,
+            "update_time": "2026-04-08T14:20:22.037112268Z",
+            "user_env_vars": {}
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjoxMjAwMDAwMDAwMDAwLCJkZWxldGUiOjEyMDAwMDAwMDAwMDAsInVwZGF0ZSI6MTIwMDAwMDAwMDAwMH0sInNjaGVtYV92ZXJzaW9uIjoiMSJ9",
+          "dependencies": [
+            "google_project_iam_member.eventarc_receiver",
+            "google_project_iam_member.secret_accessor",
+            "google_project_iam_member.workflow_invoker",
+            "google_service_account.function_sa",
+            "time_sleep.wait_iam_propagation"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "time_sleep",
+      "name": "wait_iam_propagation",
+      "provider": "provider[\"registry.terraform.io/hashicorp/time\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "create_duration": "45s",
+            "destroy_duration": null,
+            "id": "2026-04-08T13:10:30Z",
+            "triggers": null
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "dependencies": [
+            "google_project_iam_member.eventarc_receiver",
+            "google_project_iam_member.secret_accessor",
+            "google_project_iam_member.workflow_invoker",
+            "google_service_account.function_sa"
+          ]
+        }
+      ]
+    }
+  ],
+  "check_results": null
+}

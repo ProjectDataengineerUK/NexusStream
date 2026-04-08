@@ -1,0 +1,7 @@
+config {
+  type: "declaration",
+  database: "seu-projeto-id",
+  schema: "nexus_raw_layer",
+  name: "stg_weather_external",
+  description: "Tabela externa que lê JSONs brutos do Cloud Storage"
+}
