@@ -1,33 +1,37 @@
-name: 'Dataform CI/CD'
-
+name: Dataform Run
 on:
   push:
-    branches: [ "main" ]
-  pull_request:
-    paths:
-      - 'definitions/**'
-      - 'workflow_settings.yaml'
-
-permissions:
-  contents: read
-  id-token: write
+    branches: [ main ]
 
 jobs:
-  dataform-ci:
+  dataform_job:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Google Auth
+      # 1. Autenticação no GCP usando sua SA_KEY
+      - id: 'auth'
         uses: 'google-github-actions/auth@v2'
         with:
           credentials_json: '${{ secrets.GCP_SA_KEY }}'
 
-      - name: Install Dataform CLI
-        run: npm i -g @dataform/cli
+      # 2. Setup do Cloud SDK para usar o Project ID
+      - name: 'Set up Cloud SDK'
+        uses: 'google-github-actions/setup-gcloud@v2'
+        with:
+          project_id: '${{ secrets.GCP_PROJECT_ID }}'
 
-      - name: Dataform Compile
+      # 3. Exemplo de uso da API do OpenWeather (via Python/Node)
+      - name: Fetch Weather Data
+        env:
+          WEATHER_KEY: ${{ secrets.OPENWEATHER_API_KEY }}
         run: |
-          dataform install
-          dataform compile
+          echo "Executando script de ingestão de clima..."
+          # Aqui entraria seu script de python ou curl
+
+      # 4. Execução do Dataform
+      - name: Run Dataform
+        run: |
+          npm install -g @dataform/cli
+          dataform run --project ${{ secrets.GCP_PROJECT_ID }}
