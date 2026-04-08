@@ -24,21 +24,18 @@ provider "google" {
 # 0. ATIVAÇÃO DE APIS ESSENCIAIS
 # =============================================================================
 
-# Esta é a API que causou o seu erro 403
 resource "google_project_service" "cloudresourcemanager" {
   project            = var.project_id
   service            = "cloudresourcemanager.googleapis.com"
   disable_on_destroy = false
 }
 
-# Recomendado ativar também a de IAM para evitar problemas similares
 resource "google_project_service" "iam" {
   project            = var.project_id
   service            = "iam.googleapis.com"
   disable_on_destroy = false
 }
 
-# Obtém dados do projeto (agora depende da ativação da API acima)
 data "google_project" "project" {
   depends_on = [google_project_service.cloudresourcemanager]
 }
@@ -46,20 +43,18 @@ data "google_project" "project" {
 # =============================================================================
 # 1. IDENTIDADE CENTRAL (Service Account)
 # =============================================================================
+
 resource "google_service_account" "function_sa" {
   account_id   = "nexus-stream-sa"
   display_name = "Service Account para NexusStream Pipeline"
   project      = var.project_id
-
-  # Garante que a SA só seja criada após as APIs estarem ativas
-  depends_on = [google_project_service.iam]
+  depends_on   = [google_project_service.iam]
 }
 
 # =============================================================================
 # 2. PERMISSÕES DE IAM
 # =============================================================================
 
-# Adicionei o 'depends_on' para garantir que a API Resource Manager esteja pronta
 resource "google_project_iam_member" "eventarc_receiver" {
   project    = var.project_id
   role       = "roles/eventarc.eventReceiver"
@@ -102,4 +97,29 @@ resource "google_project_iam_member" "workflow_dataform_editor" {
   depends_on = [google_project_service.cloudresourcemanager]
 }
 
-# ... (restante das permissões de Service Agents permanecem iguais)
+# =============================================================================
+# 3. RECURSOS DE INFRA (Artifacts & Wait)
+# =============================================================================
+
+# Declarando o repositório que o functions.tf não estava achando
+resource "google_artifact_registry_repository" "nexus_repo" {
+  location      = var.region
+  repository_id = "nexus-functions-repo"
+  description   = "Repositorio para imagens e artefatos do NexusStream"
+  format        = "DOCKER"
+  depends_on    = [google_project_service.cloudresourcemanager]
+}
+
+# Declarando a pausa que o functions.tf e workflows.tf não estavam achando
+resource "time_sleep" "wait_iam_propagation" {
+  depends_on = [
+    google_service_account.function_sa,
+    google_project_iam_member.eventarc_receiver,
+    google_project_iam_member.workflow_invoker,
+    google_project_iam_member.secret_accessor,
+    google_project_iam_member.act_as,
+    google_project_iam_member.workflow_invoker_run,
+    google_project_iam_member.workflow_dataform_editor
+  ]
+  create_duration = "50s"
+}
