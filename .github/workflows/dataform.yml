@@ -43,19 +43,29 @@ jobs:
             -d "{\"gitCommitish\": \"main\"}" \
             "https://dataform.googleapis.com/v1beta1/$REPO_PATH/compilationResults")
 
+          # --- NOVA VERIFICAÇÃO DE ERROS ---
+          # Extrai erros de compilação (sintaxe, referências, etc)
+          COMPILATION_ERRORS=$(echo $COMPILATION_RESPONSE | jq -r '.compilationErrors // empty')
+
+          if [ ! -z "$COMPILATION_ERRORS" ]; then
+            echo "❌ ERRO DE COMPILAÇÃO DETECTADO NO DATAFORM:"
+            echo "$COMPILATION_RESPONSE" | jq '.compilationErrors'
+            exit 1
+          fi
+          # ---------------------------------
+
           COMPILATION_NAME=$(echo $COMPILATION_RESPONSE | jq -r .name)
 
           if [ "$COMPILATION_NAME" == "null" ] || [ -z "$COMPILATION_NAME" ]; then
-            echo "Erro na compilação: $COMPILATION_RESPONSE"
+            echo "❌ Erro crítico na chamada da API de compilação: $COMPILATION_RESPONSE"
             exit 1
           fi
 
-          echo "Compilação bem-sucedida: $COMPILATION_NAME"
+          echo "✅ Compilação bem-sucedida: $COMPILATION_NAME"
 
           # PASSO 2: Invocação
           echo "Preparando Invocação..."
           
-          # Criando o JSON via printf para evitar problemas de identação com heredocs (EOF)
           INVOCATION_JSON=$(printf '{"compilationResult":"%s","invocationConfig":{"serviceAccount":"%s"}}' "$COMPILATION_NAME" "$SERVICE_ACCOUNT_EMAIL")
 
           echo "Disparando Workflow Invocation..."
@@ -65,13 +75,12 @@ jobs:
             -d "$INVOCATION_JSON" \
             "https://dataform.googleapis.com/v1beta1/$REPO_PATH/workflowInvocations")
 
-          echo "Resposta da API de Invocação: $INVOCATION_RESPONSE"
-          
           INVOCATION_ID=$(echo $INVOCATION_RESPONSE | jq -r .name)
           
           if [ "$INVOCATION_ID" == "null" ] || [ -z "$INVOCATION_ID" ]; then
-             echo "ERRO CRÍTICO: Não foi possível disparar a execução."
+             echo "❌ ERRO CRÍTICO: Falha ao disparar a execução."
+             echo "Resposta da API: $INVOCATION_RESPONSE"
              exit 1
           fi
 
-          echo "Workflow disparado com sucesso! ID: $INVOCATION_ID"
+          echo "🚀 Workflow disparado com sucesso! ID: $INVOCATION_ID"
