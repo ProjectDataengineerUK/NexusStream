@@ -5,6 +5,7 @@ resource "google_workflows_workflow" "nexus_workflow" {
   service_account = "nexus-stream-sa@${var.project_id}.iam.gserviceaccount.com"
 
   # ADIÇÃO CRÍTICA: Permite que o Terraform exclua/recrie o recurso via CI/CD
+  # Sem isso, o erro "cannot destroy workflow" continuará aparecendo no GitHub Actions
   deletion_protection = false 
 
   depends_on = [time_sleep.wait_iam_propagation]
@@ -50,7 +51,7 @@ resource "google_workflows_workflow" "nexus_workflow" {
             return:
               message: "Ingestão realizada com sucesso"
               file_saved: $${"ingestion/weather/" + current_time + ".json"}
-              # Ajustado conforme sua nota: .code é o padrão para respostas HTTP no Workflows
+              # Corrigido de .status para .code para capturar o status HTTP 200/400/500
               http_code: $${weather_response.code}
   EOF
 }
