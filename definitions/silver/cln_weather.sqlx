@@ -1,5 +1,6 @@
 config {
   type: "table",
+  name: "weather_cleaned", // ADICIONE ISSO para o ref("weather_cleaned") funcionar
   description: "Camada Silver: Dados de clima limpos e validados",
   columns: {
     city_name: "Nome da cidade em caixa alta",
@@ -10,7 +11,7 @@ config {
     uniqueKey: ["city_name", "ingested_at"],
     nonNull: ["city_name", "temp"],
     rowConditions: [
-      "temp > -60 AND temp < 60" /* O Filtro de Barro: ignora valores absurdos */
+      "temp > -60 AND temp < 60" /* Comentário JS OK */
     ]
   }
 }

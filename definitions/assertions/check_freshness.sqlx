@@ -4,8 +4,12 @@ config {
 }
 
 SELECT
-  *
-FROM
-  ${ref("weather_cleaned")}
-HAVING
-  MAX(ingested_at) < TIMESTAMP_SUB(CURRENT_TIMESTAMP(), INTERVAL 4 HOUR)
+  max_ingested_at
+FROM (
+  SELECT
+    MAX(ingested_at) AS max_ingested_at
+  FROM
+    ${ref("cln_weather")}
+)
+WHERE
+  max_ingested_at < TIMESTAMP_SUB(CURRENT_TIMESTAMP(), INTERVAL 4 HOUR)
