@@ -11,7 +11,6 @@ jobs:
         uses: actions/checkout@v4
 
       # 1. Autenticação
-      # Garanta que a Service Account tenha: Dataform Editor e Dataform Invoker
       - id: 'auth'
         uses: 'google-github-actions/auth@v2'
         with:
@@ -24,9 +23,13 @@ jobs:
       # 3. Disparo da Invocação via Gcloud Beta
       - name: Create Dataform Workflow Invocation
         run: |
-          # O canal beta é necessário para garantir que o comando dataform seja reconhecido
+          # Instala o componente beta sem pedir interação do usuário
+          gcloud components install beta --quiet
+
+          # Executa a invocação com --quiet para aceitar confirmações automáticas
           gcloud beta dataform workflows invocations create \
             --project=${{ secrets.GCP_PROJECT_ID }} \
             --location=southamerica-east1 \
             --repository=nexus-repository \
-            --workflow-invocation-config='{"compilationConfig": {"gitCommitish": "main"}}'
+            --workflow-invocation-config='{"compilationConfig": {"gitCommitish": "main"}}' \
+            --quiet
