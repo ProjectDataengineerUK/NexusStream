@@ -33,11 +33,11 @@ resource "google_bigquery_table" "weather_staging_external" {
 
   external_data_configuration {
     autodetect    = true
-    # AJUSTE TÉCNICO: O formato correto para JSON no BigQuery Externo
     source_format = "NEWLINE_DELIMITED_JSON"
-    
-    # Lógica para ler os arquivos brutos do GCS sem precisar mover o dado
     source_uris   = ["gs://${google_storage_bucket.raw_data_bucket.name}/ingest_weather/*.json"]
+
+    # AJUSTE CRÍTICO: Impede erro 400 se o bucket estiver vazio no primeiro deploy
+    ignore_unknown_values = true
   }
 }
 

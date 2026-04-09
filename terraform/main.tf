@@ -24,29 +24,28 @@ provider "google" {
 # 0. ATIVAÇÃO DE APIS ESSENCIAIS E PAUSA
 # =============================================================================
 
-resource "google_project_service" "cloudresourcemanager" {
+resource "google_project_service" "apis" {
+  for_each = toset([
+    "cloudresourcemanager.googleapis.com",
+    "iam.googleapis.com",
+    "run.googleapis.com",      # ESSENCIAL: Resolve o erro 403 da Function
+    "dataform.googleapis.com", # ESSENCIAL: Para o Service Agent do Dataform
+    "artifactregistry.googleapis.com",
+    "cloudfunctions.googleapis.com",
+    "workflows.googleapis.com"
+  ])
   project            = var.project_id
-  service            = "cloudresourcemanager.googleapis.com"
+  service            = each.key
   disable_on_destroy = false
 }
 
-resource "google_project_service" "iam" {
-  project            = var.project_id
-  service            = "iam.googleapis.com"
-  disable_on_destroy = false
-}
-
-# NOVO: Pausa crítica para a API propagar antes de qualquer leitura ou escrita de IAM
+# Pausa crítica para as APIs propagarem e o Google criar as SAs automáticas
 resource "time_sleep" "wait_api_activation" {
-  depends_on = [
-    google_project_service.cloudresourcemanager,
-    google_project_service.iam
-  ]
-  create_duration = "45s"
+  depends_on = [google_project_service.apis]
+  create_duration = "60s" # Aumentado para 60s para maior segurança com Dataform
 }
 
 data "google_project" "project" {
-  # Agora depende do sleep, não direto da API
   depends_on = [time_sleep.wait_api_activation]
 }
 
@@ -65,45 +64,17 @@ resource "google_service_account" "function_sa" {
 # 2. PERMISSÕES DE IAM
 # =============================================================================
 
-# Todos os IAM members agora aguardam a API estar 100% pronta (via wait_api_activation)
-resource "google_project_iam_member" "eventarc_receiver" {
+resource "google_project_iam_member" "iam_roles" {
+  for_each = toset([
+    "roles/eventarc.eventReceiver",
+    "roles/workflows.invoker",
+    "roles/secretmanager.secretAccessor",
+    "roles/iam.serviceAccountUser",
+    "roles/run.invoker",
+    "roles/dataform.editor"
+  ])
   project    = var.project_id
-  role       = "roles/eventarc.eventReceiver"
-  member     = "serviceAccount:${google_service_account.function_sa.email}"
-  depends_on = [time_sleep.wait_api_activation]
-}
-
-resource "google_project_iam_member" "workflow_invoker" {
-  project    = var.project_id
-  role       = "roles/workflows.invoker"
-  member     = "serviceAccount:${google_service_account.function_sa.email}"
-  depends_on = [time_sleep.wait_api_activation]
-}
-
-resource "google_project_iam_member" "secret_accessor" {
-  project    = var.project_id
-  role       = "roles/secretmanager.secretAccessor"
-  member     = "serviceAccount:${google_service_account.function_sa.email}"
-  depends_on = [time_sleep.wait_api_activation]
-}
-
-resource "google_project_iam_member" "act_as" {
-  project    = var.project_id
-  role       = "roles/iam.serviceAccountUser"
-  member     = "serviceAccount:${google_service_account.function_sa.email}"
-  depends_on = [time_sleep.wait_api_activation]
-}
-
-resource "google_project_iam_member" "workflow_invoker_run" {
-  project    = var.project_id
-  role       = "roles/run.invoker"
-  member     = "serviceAccount:${google_service_account.function_sa.email}"
-  depends_on = [time_sleep.wait_api_activation]
-}
-
-resource "google_project_iam_member" "workflow_dataform_editor" {
-  project    = var.project_id
-  role       = "roles/dataform.editor"
+  role       = each.key
   member     = "serviceAccount:${google_service_account.function_sa.email}"
   depends_on = [time_sleep.wait_api_activation]
 }
@@ -120,17 +91,11 @@ resource "google_artifact_registry_repository" "nexus_repo" {
   depends_on    = [time_sleep.wait_api_activation]
 }
 
-# Esta segunda pausa continua sendo necessária para garantir que as permissões IAM
-# aplicadas acima sejam propagadas antes dos arquivos 'functions.tf' e 'workflows.tf' rodarem.
+# Pausa para propagação de IAM antes de deploy de Functions/Workflows
 resource "time_sleep" "wait_iam_propagation" {
   depends_on = [
     google_service_account.function_sa,
-    google_project_iam_member.eventarc_receiver,
-    google_project_iam_member.workflow_invoker,
-    google_project_iam_member.secret_accessor,
-    google_project_iam_member.act_as,
-    google_project_iam_member.workflow_invoker_run,
-    google_project_iam_member.workflow_dataform_editor
+    google_project_iam_member.iam_roles
   ]
   create_duration = "50s"
 }

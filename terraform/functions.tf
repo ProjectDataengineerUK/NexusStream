@@ -5,7 +5,7 @@ data "archive_file" "function_zip" {
   output_path = "${path.module}/ingest_weather.zip"
 }
 
-# 2. Upload para o Cloud Storage (Triggers o build no Artifact Registry)
+# 2. Upload para o Cloud Storage
 resource "google_storage_bucket_object" "function_code" {
   name   = "code/ingest_weather-${data.archive_file.function_zip.output_md5}.zip"
   bucket = google_storage_bucket.raw_data_bucket.name 
@@ -20,7 +20,7 @@ resource "google_cloudfunctions2_function" "weather_processor" {
 
   build_config {
     runtime     = "python310"
-    entry_point = "process_weather_event" # Certifique-se de que o Python agora recebe requests HTTP
+    entry_point = "process_weather_event" 
     
     # Referência ao repositório de containers no Artifact Registry
     docker_repository = google_artifact_registry_repository.nexus_repo.id
@@ -52,15 +52,13 @@ resource "google_cloudfunctions2_function" "weather_processor" {
     }
   }
 
-  # =====================================================================
-  # ATENÇÃO: O bloco 'event_trigger' foi REMOVIDO de propósito.
-  # Na Cloud Function v2, ao omitir o event_trigger, a função se torna
-  # acessível via HTTP(S) automaticamente, pronta para o Cloud Workflows.
-  # =====================================================================
-
+  # Como discutido, sem event_trigger = Chamada via HTTP (Workflows)
+  
   depends_on = [
     time_sleep.wait_iam_propagation,
     google_artifact_registry_repository.nexus_repo,
-    google_secret_manager_secret_version.weather_api_key_version
+    google_secret_manager_secret_version.weather_api_key_version,
+    # ADIÇÃO CRÍTICA: Garante que o Cloud Run (necessário para Gen2) esteja ativo
+    google_project_service.apis["run.googleapis.com"]
   ]
 }

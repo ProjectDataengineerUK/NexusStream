@@ -1,30 +1,30 @@
-# 1. Permissão para o BigQuery (Escrita na Bronze/Silver e Auditoria)
-resource "google_project_iam_member" "sa_bq_editor" {
+# =============================================================================
+# 1. PERMISSÕES PARA A SERVICE ACCOUNT DA FUNCTION (NexusStream SA)
+# =============================================================================
+
+# Permissões de BigQuery (Leitura/Escrita na Bronze e execução de Jobs)
+resource "google_project_iam_member" "sa_bq_permissions" {
+  for_each = toset([
+    "roles/bigquery.dataEditor",
+    "roles/bigquery.jobUser"
+  ])
   project = var.project_id
-  role    = "roles/bigquery.dataEditor"
+  role    = each.key
   member  = "serviceAccount:${google_service_account.function_sa.email}"
 }
 
-resource "google_project_iam_member" "sa_bq_job_user" {
+# Permissões de Storage (Leitura de arquivos brutos e escrita de logs/artefatos)
+resource "google_project_iam_member" "sa_storage_permissions" {
+  for_each = toset([
+    "roles/storage.objectViewer",
+    "roles/storage.objectCreator"
+  ])
   project = var.project_id
-  role    = "roles/bigquery.jobUser"
+  role    = each.key
   member  = "serviceAccount:${google_service_account.function_sa.email}"
 }
 
-# 2. Permissão para o Storage (Leitura de arquivos brutos e escrita de logs)
-resource "google_project_iam_member" "sa_storage_viewer" {
-  project = var.project_id
-  role    = "roles/storage.objectViewer"
-  member  = "serviceAccount:${google_service_account.function_sa.email}"
-}
-
-resource "google_storage_bucket_iam_member" "sa_storage_writer" {
-  bucket = google_storage_bucket.raw_data_bucket.name
-  role   = "roles/storage.objectCreator"
-  member = "serviceAccount:${google_service_account.function_sa.email}"
-}
-
-# 3. Permissão para o Maestro (Workflow) invocar a Function
+# Permissão para invocar a Cloud Function (necessário para o Workflows/Eventarc)
 resource "google_cloud_run_service_iam_member" "invoker" {
   location = var.region
   project  = var.project_id
@@ -33,25 +33,24 @@ resource "google_cloud_run_service_iam_member" "invoker" {
   member   = "serviceAccount:${google_service_account.function_sa.email}"
 }
 
-# 4. Permissões específicas para o DATAFORM
-resource "google_project_iam_member" "sa_dataform_editor" {
-  project = var.project_id
-  role    = "roles/dataform.editor"
-  member  = "serviceAccount:${google_service_account.function_sa.email}"
-}
+# =============================================================================
+# 2. PERMISSÕES PARA IDENTIDADES AUTOMÁTICAS (Service Agents)
+# =============================================================================
 
-# Permissão para o Service Agent do Dataform (Referenciando o data definido no main.tf)
+# AJUSTE CRÍTICO: Permissão para o Service Agent do DATAFORM
+# Essa conta é criada pelo Google com o padrão: service-PROJECT_NUMBER@gcp-sa-dataform.iam.gserviceaccount.com
 resource "google_project_iam_member" "dataform_service_agent_bq" {
   project = var.project_id
-  role    = "roles/bigquery.admin"
+  role    = "roles/bigquery.admin" 
   member  = "serviceAccount:service-${data.google_project.project.number}@gcp-sa-dataform.iam.gserviceaccount.com"
 
+  # Espera a ativação das APIs e a pausa de propagação do main.tf
   depends_on = [
     time_sleep.wait_iam_propagation 
   ]
 }
 
-# 5. Infraestrutura de Eventos (Eventarc & Pub/Sub)
+# Permissão para o Service Agent do Pub/Sub (necessário para Eventarc/Push)
 resource "google_project_iam_member" "pubsub_token_creator" {
   project = var.project_id
   role    = "roles/iam.serviceAccountTokenCreator"
@@ -60,8 +59,11 @@ resource "google_project_iam_member" "pubsub_token_creator" {
   depends_on = [time_sleep.wait_iam_propagation]
 }
 
+# Permissão para a Service Account da Function receber eventos do Eventarc
 resource "google_project_iam_member" "eventarc_event_receiver" {
   project = var.project_id
   role    = "roles/eventarc.eventReceiver"
   member  = "serviceAccount:${google_service_account.function_sa.email}"
+  
+  depends_on = [time_sleep.wait_iam_propagation]
 }
