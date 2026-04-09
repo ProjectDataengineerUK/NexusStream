@@ -29,9 +29,7 @@ jobs:
           REPO_ID="nexus-repository"
           REPO_PATH="projects/$PROJECT_ID/locations/$REGION/repositories/$REPO_ID"
           
-          # E-mail da Service Account que executará as queries no BigQuery
-          # Recomendo usar o e-mail da própria SA que você usa no secrets.GCP_SA_KEY
-          SERVICE_ACCOUNT_EMAIL="seu-sa-email@$PROJECT_ID.iam.gserviceaccount.com"
+          SERVICE_ACCOUNT_EMAIL="nexus-stream-sa@nexus-stream-project.iam.gserviceaccount.com"
 
           echo "------------------------------------------------"
           echo "Iniciando processo para: $REPO_PATH"
@@ -42,9 +40,7 @@ jobs:
           COMPILATION_RESPONSE=$(curl -s -X POST \
             -H "Authorization: Bearer $ACCESS_TOKEN" \
             -H "Content-Type: application/json" \
-            -d '{
-              "gitCommitish": "main"
-            }' \
+            -d "{\"gitCommitish\": \"main\"}" \
             "https://dataform.googleapis.com/v1beta1/$REPO_PATH/compilationResults")
 
           COMPILATION_NAME=$(echo $COMPILATION_RESPONSE | jq -r .name)
@@ -56,17 +52,17 @@ jobs:
 
           echo "Compilação bem-sucedida: $COMPILATION_NAME"
 
-          # PASSO 2: Criar a Invocação do Workflow (COM SERVICE ACCOUNT)
+          # PASSO 2: Invocação
+          echo "Preparando Invocação..."
+          
+          # Criando o JSON via printf para evitar problemas de identação com heredocs (EOF)
+          INVOCATION_JSON=$(printf '{"compilationResult":"%s","invocationConfig":{"serviceAccount":"%s"}}' "$COMPILATION_NAME" "$SERVICE_ACCOUNT_EMAIL")
+
           echo "Disparando Workflow Invocation..."
           INVOCATION_RESPONSE=$(curl -s -X POST \
             -H "Authorization: Bearer $ACCESS_TOKEN" \
             -H "Content-Type: application/json" \
-            -d "{
-              \"compilationResult\": \"$COMPILATION_NAME\",
-              \"invocationConfig\": {
-                \"serviceAccount\": \"$SERVICE_ACCOUNT_EMAIL\"
-              }
-            }" \
+            -d "$INVOCATION_JSON" \
             "https://dataform.googleapis.com/v1beta1/$REPO_PATH/workflowInvocations")
 
           echo "Resposta da API de Invocação: $INVOCATION_RESPONSE"
@@ -74,7 +70,7 @@ jobs:
           INVOCATION_ID=$(echo $INVOCATION_RESPONSE | jq -r .name)
           
           if [ "$INVOCATION_ID" == "null" ] || [ -z "$INVOCATION_ID" ]; then
-             echo "Erro ao disparar execução!"
+             echo "ERRO CRÍTICO: Não foi possível disparar a execução."
              exit 1
           fi
 
