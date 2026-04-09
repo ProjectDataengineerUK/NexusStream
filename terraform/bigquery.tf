@@ -8,7 +8,7 @@ resource "google_bigquery_dataset" "nexus_raw" {
   description                 = "Camada Bronze: Dados brutos e Auditoria"
   project                     = var.project_id
   location                    = var.region
-  # AJUSTE: Permite deletar o dataset mesmo que contenha tabelas
+  # Permite que o Terraform limpe o dataset em caso de destroy/recreate
   delete_contents_on_destroy = true 
 }
 
@@ -17,7 +17,6 @@ resource "google_bigquery_dataset" "raw_github" {
   friendly_name               = "Github Raw Data"
   project                     = var.project_id
   location                    = var.region
-  # AJUSTE: Permite deletar o dataset mesmo que contenha tabelas
   delete_contents_on_destroy = true
 }
 
@@ -32,11 +31,21 @@ resource "google_bigquery_table" "weather_staging_external" {
   deletion_protection = false
 
   external_data_configuration {
-    autodetect    = true
+    # AJUSTE PARA DEPLOY: Autodetect desativado para evitar erro de 'bucket vazio'
+    autodetect    = false 
     source_format = "NEWLINE_DELIMITED_JSON"
     source_uris   = ["gs://${google_storage_bucket.raw_data_bucket.name}/ingest_weather/*.json"]
 
-    # AJUSTE CRÍTICO: Impede erro 400 se o bucket estiver vazio no primeiro deploy
+    # Definindo o esquema manualmente para que o BigQuery aceite criar a tabela sem arquivos presentes
+    schema = <<EOF
+[
+  {"name": "city_name", "type": "STRING", "mode": "NULLABLE"},
+  {"name": "temp", "type": "FLOAT", "mode": "NULLABLE"},
+  {"name": "weather_data", "type": "JSON", "mode": "NULLABLE"},
+  {"name": "ingested_at", "type": "TIMESTAMP", "mode": "NULLABLE"}
+]
+EOF
+
     ignore_unknown_values = true
   }
 }
@@ -67,7 +76,7 @@ resource "google_bigquery_table" "weather_table" {
 EOF
 }
 
-# Tabela de Auditoria (Essencial para o componente de Monitoring)
+# Tabela de Auditoria (Monitoramento do Pipeline)
 resource "google_bigquery_table" "ingestion_audit_log" {
   dataset_id = google_bigquery_dataset.nexus_raw.dataset_id
   table_id   = "ingestion_audit_log"
@@ -91,4 +100,13 @@ resource "google_bigquery_table" "events_table" {
   table_id   = "github_events_stream"
   project    = var.project_id
   deletion_protection = false
+
+  # Schema mínimo para evitar erros no deploy
+  schema = <<EOF
+[
+  {"name": "event_type", "type": "STRING", "mode": "NULLABLE"},
+  {"name": "payload", "type": "JSON", "mode": "NULLABLE"},
+  {"name": "created_at", "type": "TIMESTAMP", "mode": "NULLABLE"}
+]
+EOF
 }
