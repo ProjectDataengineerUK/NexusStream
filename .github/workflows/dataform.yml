@@ -16,30 +16,53 @@ jobs:
         with:
           credentials_json: '${{ secrets.GCP_SA_KEY }}'
 
-      # 2. Setup do Cloud SDK (Necessário apenas para gerar o token de acesso)
+      # 2. Setup do Cloud SDK
       - name: 'Set up Cloud SDK'
         uses: 'google-github-actions/setup-gcloud@v2'
 
-      # 3. Disparo da Invocação via API (A solução definitiva)
-      - name: Create Dataform Workflow Invocation
+      # 3. Compilação e Invocação via API
+      - name: Create Dataform Workflow
         run: |
-          # 1. Gera o token dinamicamente
           ACCESS_TOKEN=$(gcloud auth print-access-token)
-          
-          # 2. Define o caminho do repositório
-          REPO_PATH="projects/${{ secrets.GCP_PROJECT_ID }}/locations/southamerica-east1/repositories/nexus-repository"
-          
-          echo "Disparando API para: $REPO_PATH"
+          PROJECT_ID="${{ secrets.GCP_PROJECT_ID }}"
+          REGION="southamerica-east1"
+          REPO_ID="nexus-repository"
+          REPO_PATH="projects/$PROJECT_ID/locations/$REGION/repositories/$REPO_ID"
 
-          # 3. Faz o POST direto na API do GCP
-          curl -X POST \
+          echo "Iniciando processo para: $REPO_PATH"
+
+          # PASSO 1: Criar o Resultado de Compilação
+          # Isso transforma seus arquivos .sqlx em um grafo de execução
+          echo "Criando Compilation Result..."
+          COMPILATION_RESPONSE=$(curl -s -X POST \
             -H "Authorization: Bearer $ACCESS_TOKEN" \
             -H "Content-Type: application/json" \
             -d '{
-              "workflowInvocationConfig": {
-                "compilationConfig": {
-                  "gitCommitish": "main"
-                }
-              }
+              "gitCommitish": "main"
             }' \
-            "https://dataform.googleapis.com/v1beta1/$REPO_PATH/workflowInvocations"
+            "https://dataform.googleapis.com/v1beta1/$REPO_PATH/compilationResults")
+
+          # Extrai o nome da compilação (formato: projects/.../compilationResults/UUID)
+          COMPILATION_NAME=$(echo $COMPILATION_RESPONSE | jq -r .name)
+
+          if [ "$COMPILATION_NAME" == "null" ]; then
+            echo "Erro na compilação: $COMPILATION_RESPONSE"
+            exit 1
+          fi
+
+          echo "Compilação bem-sucedida: $COMPILATION_NAME"
+
+          # PASSO 2: Criar a Invocação do Workflow
+          # Aqui é onde os dados são de fato processados no BigQuery
+          echo "Disparando Workflow Invocation..."
+          INVOCATION_RESPONSE=$(curl -s -X POST \
+            -H "Authorization: Bearer $ACCESS_TOKEN" \
+            -H "Content-Type: application/json" \
+            -d "{
+              \"compilationResult\": \"$COMPILATION_NAME\"
+            }" \
+            "https://dataform.googleapis.com/v1beta1/$REPO_PATH/workflowInvocations")
+
+          INVOCATION_ID=$(echo $INVOCATION_RESPONSE | jq -r .name)
+          
+          echo "Workflow disparado com sucesso! ID: $INVOCATION_ID"
