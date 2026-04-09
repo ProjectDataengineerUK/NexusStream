@@ -1,5 +1,4 @@
 # 1. Gerar o ZIP do código-fonte
-# Certifique-se de que o requirements.txt está dentro da pasta ../functions/ingest_weather
 data "archive_file" "function_zip" {
   type        = "zip"
   source_dir  = "${path.module}/../functions/ingest_weather"
@@ -8,7 +7,6 @@ data "archive_file" "function_zip" {
 
 # 2. Upload para o Cloud Storage
 resource "google_storage_bucket_object" "function_code" {
-  # O uso do md5 no nome garante que o build seja disparado sempre que o código ou requirements mudar
   name   = "code/ingest_weather-${data.archive_file.function_zip.output_md5}.zip"
   bucket = google_storage_bucket.raw_data_bucket.name 
   source = data.archive_file.function_zip.output_path
@@ -35,7 +33,6 @@ resource "google_cloudfunctions2_function" "weather_processor" {
       }
     }
 
-    # AJUSTE: Força o ambiente de build a reconhecer o arquivo principal
     environment_variables = {
       GOOGLE_FUNCTION_SOURCE = "main.py"
     }
@@ -52,7 +49,9 @@ resource "google_cloudfunctions2_function" "weather_processor" {
     secret_environment_variables {
       key        = "OPENWEATHER_API_KEY"
       project_id = var.project_id
-      secret     = google_secret_manager_secret.weather_api_key.id # Usando .id para referência direta
+      # CORREÇÃO: Usamos o secret_id puro. O provider v2 se encarrega de montar 
+      # a string "projects/.../secrets/..." que o Cloud Run exige.
+      secret     = google_secret_manager_secret.weather_api_key.secret_id
       version    = "latest"
     }
 
@@ -61,7 +60,6 @@ resource "google_cloudfunctions2_function" "weather_processor" {
     }
   }
 
-  # Importante: A função depende explicitamente do upload do objeto de código
   depends_on = [
     google_storage_bucket_object.function_code,
     time_sleep.wait_iam_propagation,
