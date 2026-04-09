@@ -33,5 +33,15 @@ jobs:
       # 4. Execução do Dataform
       - name: Run Dataform
         run: |
+          # Instala a CLI globalmente
           npm install -g @dataform/cli
-          dataform run --project ${{ secrets.GCP_PROJECT_ID }}
+          
+          # Navega até a pasta onde está o projeto Dataform (ajuste se necessário)
+          # cd dataform_project_folder 
+          
+          # Instala os pacotes do Dataform (necessário para compilar o projeto)
+          dataform install
+          
+          # Executa o projeto apontando para o projeto correto
+          # AJUSTE: Mudança de --project para --project-id
+          dataform run --project-id ${{ secrets.GCP_PROJECT_ID }}
