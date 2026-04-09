@@ -1,0 +1,31 @@
+name: Dataform Remote Trigger
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  trigger_dataform:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      # 1. Autenticação (Sua SA precisa de roles/dataform.editor e roles/dataform.admin)
+      - id: 'auth'
+        uses: 'google-github-actions/auth@v2'
+        with:
+          credentials_json: '${{ secrets.GCP_SA_KEY }}'
+
+      # 2. Setup do Cloud SDK
+      - name: 'Set up Cloud SDK'
+        uses: 'google-github-actions/setup-gcloud@v2'
+
+      # 3. Disparo da Invocação
+      - name: Create Dataform Workflow Invocation
+        run: |
+          # Substitua 'nexus-repository' pelo nome que você criou no Console do Dataform
+          gcloud dataform workflows invocations create \
+            --project=${{ secrets.GCP_PROJECT_ID }} \
+            --location=southamerica-east1 \
+            --repository=nexus-repository \
+            --workflow-invocation-config='{"compilationConfig": {"gitCommitish": "main"}}'
