@@ -1,3 +1,6 @@
+# Dados do projeto para pegar o Project Number automaticamente
+data "google_project" "project" {}
+
 # 1. Permissão para o BigQuery (Escrita na Bronze/Silver e Auditoria)
 resource "google_project_iam_member" "sa_bq_editor" {
   project = var.project_id
@@ -33,19 +36,23 @@ resource "google_cloud_run_service_iam_member" "invoker" {
   member   = "serviceAccount:${google_service_account.function_sa.email}"
 }
 
-# 4. Permissões específicas para o DATAFORM (O Filtro de Barro)
-# Permite que a SA do pipeline dispare execuções no Dataform
+# 4. Permissões específicas para o DATAFORM
 resource "google_project_iam_member" "sa_dataform_editor" {
   project = var.project_id
   role    = "roles/dataform.editor"
   member  = "serviceAccount:${google_service_account.function_sa.email}"
 }
 
-# Permissão para o Service Agent do Dataform (O Google operando o SQL)
+# AJUSTE: Permissão para o Service Agent do Dataform com espera de propagação
 resource "google_project_iam_member" "dataform_service_agent_bq" {
   project = var.project_id
-  role    = "roles/bigquery.admin" # Admin no BQ para criar/deletar tabelas Silver/Assertions
+  role    = "roles/bigquery.admin"
   member  = "serviceAccount:service-${data.google_project.project.number}@gcp-sa-dataform.iam.gserviceaccount.com"
+
+  # Força o Terraform a esperar a API e o tempo de propagação antes de criar
+  depends_on = [
+    time_sleep.wait_iam_propagation 
+  ]
 }
 
 # 5. Infraestrutura de Eventos (Eventarc & Pub/Sub)
@@ -53,6 +60,8 @@ resource "google_project_iam_member" "pubsub_token_creator" {
   project = var.project_id
   role    = "roles/iam.serviceAccountTokenCreator"
   member  = "serviceAccount:service-${data.google_project.project.number}@gcp-sa-pubsub.iam.gserviceaccount.com"
+  
+  depends_on = [time_sleep.wait_iam_propagation]
 }
 
 resource "google_project_iam_member" "eventarc_event_receiver" {
