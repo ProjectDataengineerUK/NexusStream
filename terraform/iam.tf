@@ -65,4 +65,3 @@ resource "google_project_iam_member" "eventarc_event_receiver" {
   role    = "roles/eventarc.eventReceiver"
   member  = "serviceAccount:${google_service_account.function_sa.email}"
 }
-}
