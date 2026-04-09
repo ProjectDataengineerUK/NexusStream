@@ -10,7 +10,8 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      # 1. Autenticação (Sua SA precisa de roles/dataform.editor e roles/dataform.admin)
+      # 1. Autenticação
+      # Garanta que a Service Account tenha: Dataform Editor e Dataform Invoker
       - id: 'auth'
         uses: 'google-github-actions/auth@v2'
         with:
@@ -20,11 +21,11 @@ jobs:
       - name: 'Set up Cloud SDK'
         uses: 'google-github-actions/setup-gcloud@v2'
 
-      # 3. Disparo da Invocação
+      # 3. Disparo da Invocação via Gcloud Beta
       - name: Create Dataform Workflow Invocation
         run: |
-          # Substitua 'nexus-repository' pelo nome que você criou no Console do Dataform
-          gcloud dataform workflows invocations create \
+          # O canal beta é necessário para garantir que o comando dataform seja reconhecido
+          gcloud beta dataform workflows invocations create \
             --project=${{ secrets.GCP_PROJECT_ID }} \
             --location=southamerica-east1 \
             --repository=nexus-repository \
