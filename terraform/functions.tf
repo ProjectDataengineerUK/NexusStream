@@ -1,4 +1,5 @@
 # 1. Gerar o ZIP do código-fonte
+# Certifique-se de que o requirements.txt está dentro da pasta ../functions/ingest_weather
 data "archive_file" "function_zip" {
   type        = "zip"
   source_dir  = "${path.module}/../functions/ingest_weather"
@@ -7,6 +8,7 @@ data "archive_file" "function_zip" {
 
 # 2. Upload para o Cloud Storage
 resource "google_storage_bucket_object" "function_code" {
+  # O uso do md5 no nome garante que o build seja disparado sempre que o código ou requirements mudar
   name   = "code/ingest_weather-${data.archive_file.function_zip.output_md5}.zip"
   bucket = google_storage_bucket.raw_data_bucket.name 
   source = data.archive_file.function_zip.output_path
@@ -32,6 +34,11 @@ resource "google_cloudfunctions2_function" "weather_processor" {
         object = google_storage_bucket_object.function_code.name
       }
     }
+
+    # AJUSTE: Força o ambiente de build a reconhecer o arquivo principal
+    environment_variables = {
+      GOOGLE_FUNCTION_SOURCE = "main.py"
+    }
   }
 
   service_config {
@@ -40,13 +47,12 @@ resource "google_cloudfunctions2_function" "weather_processor" {
     timeout_seconds    = 60
     service_account_email = google_service_account.function_sa.email
 
-    # CORREÇÃO: Utilizando valor aceito pelo provider para chamadas via Workflows/Internas
     ingress_settings = "ALLOW_INTERNAL_ONLY" 
 
     secret_environment_variables {
       key        = "OPENWEATHER_API_KEY"
       project_id = var.project_id
-      secret     = google_secret_manager_secret.weather_api_key.secret_id
+      secret     = google_secret_manager_secret.weather_api_key.id # Usando .id para referência direta
       version    = "latest"
     }
 
@@ -55,14 +61,15 @@ resource "google_cloudfunctions2_function" "weather_processor" {
     }
   }
 
+  # Importante: A função depende explicitamente do upload do objeto de código
   depends_on = [
+    google_storage_bucket_object.function_code,
     time_sleep.wait_iam_propagation,
     google_artifact_registry_repository.nexus_repo,
     google_secret_manager_secret_version.weather_api_key_version,
     google_project_service.apis["run.googleapis.com"],
     google_project_service.apis["artifactregistry.googleapis.com"],
-    google_project_service.apis["cloudfunctions.googleapis.com"],
-    google_storage_bucket_object.function_code 
+    google_project_service.apis["cloudfunctions.googleapis.com"]
   ]
 }
 
