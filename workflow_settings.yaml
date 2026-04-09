@@ -1,2 +1,3 @@
-defaultProject: "nexus-stream-project"
 defaultLocation: "southamerica-east1"
+defaultDataset: "nexus_raw_layer"
+defaultAssertionDataset: "dataform_assertions"
