@@ -10,13 +10,7 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      # DEBUG: Verifica se os arquivos estão na raiz do Runner do GitHub
-      - name: List files in runner
-        run: |
-          echo "Verificando arquivos no repositório antes do disparo:"
-          ls -R
-
-      # 1. Autenticação
+      # 1. Autenticação no GCP
       - id: 'auth'
         uses: 'google-github-actions/auth@v2'
         with:
@@ -34,16 +28,18 @@ jobs:
           REGION="southamerica-east1"
           REPO_ID="nexus-repository"
           REPO_PATH="projects/$PROJECT_ID/locations/$REGION/repositories/$REPO_ID"
+          
+          # E-mail da Service Account que executará as queries no BigQuery
+          # Recomendo usar o e-mail da própria SA que você usa no secrets.GCP_SA_KEY
+          SERVICE_ACCOUNT_EMAIL="seu-sa-email@$PROJECT_ID.iam.gserviceaccount.com"
 
           echo "------------------------------------------------"
           echo "Iniciando processo para: $REPO_PATH"
-          echo "Branch: main"
           echo "------------------------------------------------"
 
           # PASSO 1: Criar o Resultado de Compilação
           echo "Criando Compilation Result..."
-          # Removido o -s (silent) do curl para ver cabeçalhos de erro se necessário
-          COMPILATION_RESPONSE=$(curl -X POST \
+          COMPILATION_RESPONSE=$(curl -s -X POST \
             -H "Authorization: Bearer $ACCESS_TOKEN" \
             -H "Content-Type: application/json" \
             -d '{
@@ -51,28 +47,25 @@ jobs:
             }' \
             "https://dataform.googleapis.com/v1beta1/$REPO_PATH/compilationResults")
 
-          # Log da resposta completa para inspeção
-          echo "Resposta da API de Compilação: $COMPILATION_RESPONSE"
-
           COMPILATION_NAME=$(echo $COMPILATION_RESPONSE | jq -r .name)
 
           if [ "$COMPILATION_NAME" == "null" ] || [ -z "$COMPILATION_NAME" ]; then
-            echo "CRITICAL ERROR: A compilação falhou. Verifique se o Dataform tem acesso ao Git."
-            # Verifica se o erro é o específico de package.json
-            ERROR_MSG=$(echo $COMPILATION_RESPONSE | jq -r .error.message)
-            echo "Mensagem de Erro do Google: $ERROR_MSG"
+            echo "Erro na compilação: $COMPILATION_RESPONSE"
             exit 1
           fi
 
           echo "Compilação bem-sucedida: $COMPILATION_NAME"
 
-          # PASSO 2: Criar a Invocação do Workflow
+          # PASSO 2: Criar a Invocação do Workflow (COM SERVICE ACCOUNT)
           echo "Disparando Workflow Invocation..."
-          INVOCATION_RESPONSE=$(curl -X POST \
+          INVOCATION_RESPONSE=$(curl -s -X POST \
             -H "Authorization: Bearer $ACCESS_TOKEN" \
             -H "Content-Type: application/json" \
             -d "{
-              \"compilationResult\": \"$COMPILATION_NAME\"
+              \"compilationResult\": \"$COMPILATION_NAME\",
+              \"invocationConfig\": {
+                \"serviceAccount\": \"$SERVICE_ACCOUNT_EMAIL\"
+              }
             }" \
             "https://dataform.googleapis.com/v1beta1/$REPO_PATH/workflowInvocations")
 
@@ -80,7 +73,7 @@ jobs:
           
           INVOCATION_ID=$(echo $INVOCATION_RESPONSE | jq -r .name)
           
-          if [ "$INVOCATION_ID" == "null" ]; then
+          if [ "$INVOCATION_ID" == "null" ] || [ -z "$INVOCATION_ID" ]; then
              echo "Erro ao disparar execução!"
              exit 1
           fi

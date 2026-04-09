@@ -10,7 +10,7 @@ config {
     uniqueKey: ["city_name", "ingested_at"],
     nonNull: ["city_name", "temp"],
     rowConditions: [
-      "temp > -60 AND temp < 60" -- O Filtro de Barro: ignora valores absurdos
+      "temp > -60 AND temp < 60" /* O Filtro de Barro: ignora valores absurdos */
     ]
   }
 }
