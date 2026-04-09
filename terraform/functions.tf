@@ -10,6 +10,8 @@ resource "google_storage_bucket_object" "function_code" {
   name   = "code/ingest_weather-${data.archive_file.function_zip.output_md5}.zip"
   bucket = google_storage_bucket.raw_data_bucket.name 
   source = data.archive_file.function_zip.output_path
+
+  depends_on = [google_storage_bucket.raw_data_bucket]
 }
 
 # 3. Definição da Cloud Function v2
@@ -22,7 +24,6 @@ resource "google_cloudfunctions2_function" "weather_processor" {
     runtime     = "python310"
     entry_point = "process_weather_event" 
     
-    # Referência ao repositório de containers no Artifact Registry
     docker_repository = google_artifact_registry_repository.nexus_repo.id
 
     source {
@@ -39,7 +40,9 @@ resource "google_cloudfunctions2_function" "weather_processor" {
     timeout_seconds    = 60
     service_account_email = google_service_account.function_sa.email
 
-    # Injeção de Segredos (OpenWeather API)
+    # CORREÇÃO: Utilizando valor aceito pelo provider para chamadas via Workflows/Internas
+    ingress_settings = "ALLOW_INTERNAL_ONLY" 
+
     secret_environment_variables {
       key        = "OPENWEATHER_API_KEY"
       project_id = var.project_id
@@ -52,13 +55,18 @@ resource "google_cloudfunctions2_function" "weather_processor" {
     }
   }
 
-  # Como discutido, sem event_trigger = Chamada via HTTP (Workflows)
-  
   depends_on = [
     time_sleep.wait_iam_propagation,
     google_artifact_registry_repository.nexus_repo,
     google_secret_manager_secret_version.weather_api_key_version,
-    # ADIÇÃO CRÍTICA: Garante que o Cloud Run (necessário para Gen2) esteja ativo
-    google_project_service.apis["run.googleapis.com"]
+    google_project_service.apis["run.googleapis.com"],
+    google_project_service.apis["artifactregistry.googleapis.com"],
+    google_project_service.apis["cloudfunctions.googleapis.com"],
+    google_storage_bucket_object.function_code 
   ]
+}
+
+# 4. OUTPUT para conferência
+output "function_uri" {
+  value = google_cloudfunctions2_function.weather_processor.service_config[0].uri
 }
