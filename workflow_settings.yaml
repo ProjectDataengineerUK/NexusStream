@@ -1,3 +1,9 @@
+# workflow_settings.yaml na raiz do Git
+defaultProject: "nexus-stream-project" 
 defaultLocation: "southamerica-east1"
 defaultDataset: "nexus_raw_layer"
 defaultAssertionDataset: "dataform_assertions"
+
+# Você pode criar variáveis personalizadas para usar no SQLX
+vars:
+  env: "production"
