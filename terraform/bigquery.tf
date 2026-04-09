@@ -8,7 +8,8 @@ resource "google_bigquery_dataset" "nexus_raw" {
   description                 = "Camada Bronze: Dados brutos e Auditoria"
   project                     = var.project_id
   location                    = var.region
-  delete_contents_on_destroy = false
+  # AJUSTE: Permite deletar o dataset mesmo que contenha tabelas
+  delete_contents_on_destroy = true 
 }
 
 resource "google_bigquery_dataset" "raw_github" {
@@ -16,7 +17,8 @@ resource "google_bigquery_dataset" "raw_github" {
   friendly_name               = "Github Raw Data"
   project                     = var.project_id
   location                    = var.region
-  delete_contents_on_destroy = false
+  # AJUSTE: Permite deletar o dataset mesmo que contenha tabelas
+  delete_contents_on_destroy = true
 }
 
 # =============================================================================
@@ -65,7 +67,7 @@ resource "google_bigquery_table" "weather_table" {
 EOF
 }
 
-# Tabela de Auditoria (Essencial para o componente de Monitoring do seu diagrama)
+# Tabela de Auditoria (Essencial para o componente de Monitoring)
 resource "google_bigquery_table" "ingestion_audit_log" {
   dataset_id = google_bigquery_dataset.nexus_raw.dataset_id
   table_id   = "ingestion_audit_log"
