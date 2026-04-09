@@ -1,6 +1,6 @@
 # --- SEGURANÇA (O mais importante) ---
 # Bloqueia qualquer arquivo JSON (onde geralmente estão as chaves do GCP)
-*.json
+#*.json
 # Caso você use nomes específicos para chaves
 credentials.json
 key.json
