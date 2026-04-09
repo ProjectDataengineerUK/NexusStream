@@ -1,13 +1,13 @@
 resource "google_workflows_workflow" "nexus_workflow" {
   name            = "nexus-main-workflow"
   region          = var.region
-  project           = var.project_id
+  project         = var.project_id
   service_account = "nexus-stream-sa@${var.project_id}.iam.gserviceaccount.com"
   deletion_protection = false 
 
   depends_on = [
     time_sleep.wait_iam_propagation,
-    google_cloudfunctions2_function.weather_processor # Garante que a função exista antes do workflow
+    google_cloudfunctions2_function.weather_processor
   ]
 
   source_contents = <<-EOF
@@ -19,7 +19,6 @@ resource "google_workflows_workflow" "nexus_workflow" {
               - bucket_name: "${var.project_id}-nexus-raw-data"
               - city: "Sao Paulo"
               - current_time: $${string(int(sys.now()))}
-              # A URL da função é injetada aqui pelo Terraform
               - function_url: "${google_cloudfunctions2_function.weather_processor.service_config[0].uri}"
 
         - get_secret:
@@ -49,13 +48,13 @@ resource "google_workflows_workflow" "nexus_workflow" {
               name: $${"ingestion/weather/" + current_time + ".json"}
               body: $${weather_response.body}
 
-        # --- PASSO ADICIONADO: Aciona a Function para processar para o BigQuery ---
+        # --- PASSO CORRIGIDO: OIDC para Cloud Functions Gen2 ---
         - call_processor:
             call: http.post
             args:
               url: $${function_url}
               auth:
-                type: OAuth2
+                type: OIDC  # OIDC é obrigatório para autenticação entre serviços Cloud Run/Functions v2
               body:
                 bucket: $${bucket_name}
                 file: $${"ingestion/weather/" + current_time + ".json"}

@@ -13,10 +13,10 @@ resource "google_project_iam_member" "sa_bq_permissions" {
   member  = "serviceAccount:${google_service_account.function_sa.email}"
 }
 
-# AJUSTE: Permissão de Storage (Alterado para objectAdmin para permitir DELETE/Sobrescrita)
+# Permissão de Storage (Admin para permitir que a function limpe/mova arquivos se necessário)
 resource "google_project_iam_member" "sa_storage_permissions" {
   project = var.project_id
-  role    = "roles/storage.objectAdmin" # Substitui Viewer/Creator para evitar erro 403 na linha 31
+  role    = "roles/storage.objectAdmin"
   member  = "serviceAccount:${google_service_account.function_sa.email}"
 }
 
@@ -37,14 +37,27 @@ resource "google_cloud_run_service_iam_member" "workflow_invokes_function" {
   project  = var.project_id
   service  = google_cloudfunctions2_function.weather_processor.name
   role     = "roles/run.invoker"
-  # O Workflow roda com a conta nexus-stream-sa
   member   = "serviceAccount:nexus-stream-sa@${var.project_id}.iam.gserviceaccount.com"
 }
 
-# Permissão para o Workflow ler segredos (necessário para pegar a API Key)
+# AJUSTE CRÍTICO: Permite que o Workflow gere o Token OIDC necessário para a chamada
+resource "google_service_account_iam_member" "workflow_sa_user" {
+  service_account_id = "projects/${var.project_id}/serviceAccounts/nexus-stream-sa@${var.project_id}.iam.gserviceaccount.com"
+  role               = "roles/iam.serviceAccountUser"
+  member             = "serviceAccount:nexus-stream-sa@${var.project_id}.iam.gserviceaccount.com"
+}
+
+# Permissão para o Workflow ler segredos (necessário para a API Key)
 resource "google_project_iam_member" "workflow_secret_access" {
   project = var.project_id
   role    = "roles/secretmanager.secretAccessor"
+  member  = "serviceAccount:nexus-stream-sa@${var.project_id}.iam.gserviceaccount.com"
+}
+
+# Permissão para o Workflow inserir objetos no Storage (onde ele salva o JSON bruto)
+resource "google_project_iam_member" "workflow_storage_insert" {
+  project = var.project_id
+  role    = "roles/storage.objectCreator"
   member  = "serviceAccount:nexus-stream-sa@${var.project_id}.iam.gserviceaccount.com"
 }
 
@@ -52,29 +65,16 @@ resource "google_project_iam_member" "workflow_secret_access" {
 # 3. PERMISSÕES PARA IDENTIDADES AUTOMÁTICAS (Service Agents)
 # =============================================================================
 
-# Permissão para o Service Agent do DATAFORM
 resource "google_project_iam_member" "dataform_service_agent_bq" {
   project = var.project_id
   role    = "roles/bigquery.admin" 
   member  = "serviceAccount:service-${data.google_project.project.number}@gcp-sa-dataform.iam.gserviceaccount.com"
-
   depends_on = [time_sleep.wait_iam_propagation]
 }
 
-# Permissão para o Service Agent do Pub/Sub
 resource "google_project_iam_member" "pubsub_token_creator" {
   project = var.project_id
   role    = "roles/iam.serviceAccountTokenCreator"
   member  = "serviceAccount:service-${data.google_project.project.number}@gcp-sa-pubsub.iam.gserviceaccount.com"
-  
-  depends_on = [time_sleep.wait_iam_propagation]
-}
-
-# Permissão para receber eventos (útil se você decidir usar Eventarc no futuro)
-resource "google_project_iam_member" "eventarc_event_receiver" {
-  project = var.project_id
-  role    = "roles/eventarc.eventReceiver"
-  member  = "serviceAccount:${google_service_account.function_sa.email}"
-  
   depends_on = [time_sleep.wait_iam_propagation]
 }
