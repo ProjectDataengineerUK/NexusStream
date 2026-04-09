@@ -16,20 +16,30 @@ jobs:
         with:
           credentials_json: '${{ secrets.GCP_SA_KEY }}'
 
-      # 2. Setup do Cloud SDK
+      # 2. Setup do Cloud SDK (Necessário apenas para gerar o token de acesso)
       - name: 'Set up Cloud SDK'
         uses: 'google-github-actions/setup-gcloud@v2'
 
-      # 3. Disparo da Invocação via Gcloud Beta
+      # 3. Disparo da Invocação via API (A solução definitiva)
       - name: Create Dataform Workflow Invocation
         run: |
-          # Instala o componente beta sem pedir interação do usuário
-          gcloud components install beta --quiet
+          # 1. Gera o token dinamicamente
+          ACCESS_TOKEN=$(gcloud auth print-access-token)
+          
+          # 2. Define o caminho do repositório
+          REPO_PATH="projects/${{ secrets.GCP_PROJECT_ID }}/locations/southamerica-east1/repositories/nexus-repository"
+          
+          echo "Disparando API para: $REPO_PATH"
 
-          # Executa a invocação com --quiet para aceitar confirmações automáticas
-          gcloud beta dataform workflows invocations create \
-            --project=${{ secrets.GCP_PROJECT_ID }} \
-            --location=southamerica-east1 \
-            --repository=nexus-repository \
-            --workflow-invocation-config='{"compilationConfig": {"gitCommitish": "main"}}' \
-            --quiet
+          # 3. Faz o POST direto na API do GCP
+          curl -X POST \
+            -H "Authorization: Bearer $ACCESS_TOKEN" \
+            -H "Content-Type: application/json" \
+            -d '{
+              "workflowInvocationConfig": {
+                "compilationConfig": {
+                  "gitCommitish": "main"
+                }
+              }
+            }' \
+            "https://dataform.googleapis.com/v1beta1/$REPO_PATH/workflowInvocations"
