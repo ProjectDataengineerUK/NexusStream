@@ -1,6 +1,3 @@
-# Dados do projeto para pegar o Project Number automaticamente
-data "google_project" "project" {}
-
 # 1. Permissão para o BigQuery (Escrita na Bronze/Silver e Auditoria)
 resource "google_project_iam_member" "sa_bq_editor" {
   project = var.project_id
@@ -43,13 +40,12 @@ resource "google_project_iam_member" "sa_dataform_editor" {
   member  = "serviceAccount:${google_service_account.function_sa.email}"
 }
 
-# AJUSTE: Permissão para o Service Agent do Dataform com espera de propagação
+# Permissão para o Service Agent do Dataform (Referenciando o data definido no main.tf)
 resource "google_project_iam_member" "dataform_service_agent_bq" {
   project = var.project_id
   role    = "roles/bigquery.admin"
   member  = "serviceAccount:service-${data.google_project.project.number}@gcp-sa-dataform.iam.gserviceaccount.com"
 
-  # Força o Terraform a esperar a API e o tempo de propagação antes de criar
   depends_on = [
     time_sleep.wait_iam_propagation 
   ]
@@ -68,4 +64,5 @@ resource "google_project_iam_member" "eventarc_event_receiver" {
   project = var.project_id
   role    = "roles/eventarc.eventReceiver"
   member  = "serviceAccount:${google_service_account.function_sa.email}"
+}
 }
