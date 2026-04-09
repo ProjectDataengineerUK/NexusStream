@@ -4,6 +4,9 @@ resource "google_workflows_workflow" "nexus_workflow" {
   project         = var.project_id
   service_account = "nexus-stream-sa@${var.project_id}.iam.gserviceaccount.com"
 
+  # ADIÇÃO CRÍTICA: Permite que o Terraform exclua/recrie o recurso via CI/CD
+  deletion_protection = false 
+
   depends_on = [time_sleep.wait_iam_propagation]
 
   source_contents = <<-EOF
@@ -47,7 +50,7 @@ resource "google_workflows_workflow" "nexus_workflow" {
             return:
               message: "Ingestão realizada com sucesso"
               file_saved: $${"ingestion/weather/" + current_time + ".json"}
-              # Corrigido de .status para .code
+              # Ajustado conforme sua nota: .code é o padrão para respostas HTTP no Workflows
               http_code: $${weather_response.code}
   EOF
 }
