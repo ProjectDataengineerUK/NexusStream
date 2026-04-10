@@ -11,6 +11,7 @@ key.json
 # Bloqueia o arquivo de estado (pode conter segredos em texto plano)
 *.tfstate
 *.tfstate.backup
+*.backup
 # Bloqueia o arquivo de variáveis sensíveis
 *.tfvars
 *.tfvars.json
